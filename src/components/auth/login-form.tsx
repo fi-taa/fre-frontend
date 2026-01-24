@@ -43,9 +43,27 @@ export function LoginForm() {
 
       router.push('/dashboard');
     } catch (err) {
-      const errorMessage = err instanceof Object && 'data' in err 
-        ? (err.data as { detail?: string }).detail || 'Login failed'
-        : 'Login failed. Please try again.';
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (err && typeof err === 'object') {
+        const error = err as any;
+        
+        if (error.data?.detail) {
+          errorMessage = error.data.detail;
+        } else if (error.data?.message) {
+          errorMessage = error.data.message;
+        } else if (error.status) {
+          const statusMessages: Record<number, string> = {
+            400: 'Invalid request. Please check your inputs.',
+            401: 'Incorrect email or password',
+            403: 'Access denied',
+            404: 'User not found',
+            500: 'Server error. Please try again later.',
+          };
+          errorMessage = statusMessages[error.status] || `Error: ${error.status}`;
+        }
+      }
+      
       setError(errorMessage);
     }
   }
