@@ -36,12 +36,17 @@ export function LoginForm() {
         password,
       }).unwrap();
 
-      dispatch(setAuthToken({
-        access_token: response.access_token,
-        token_type: response.token_type,
-      }));
+      if (response.access_token) {
+        dispatch(setAuthToken({
+          access_token: response.access_token,
+          token_type: response.token_type || 'Bearer',
+        }));
 
-      router.push('/dashboard');
+        await new Promise(resolve => setTimeout(resolve, 100));
+        router.push('/dashboard');
+      } else {
+        setError('Invalid login response. Please try again.');
+      }
     } catch (err) {
       let errorMessage = 'Login failed. Please try again.';
       
