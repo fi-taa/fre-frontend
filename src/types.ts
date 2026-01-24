@@ -70,7 +70,7 @@ export interface StudentUpdate {
   department_id?: number;
 }
 
-export interface Record {
+export interface PersonRecord {
   id: string;
   name: string;
   church: string;
@@ -129,11 +129,6 @@ export interface Record {
   schoolName?: string;
   specialNeeds?: string;
   [key: string]: string | number | undefined;
-}
-
-export interface User {
-  username: string;
-  password: string;
 }
 
 export interface Event {
