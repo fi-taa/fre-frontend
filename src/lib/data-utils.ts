@@ -58,15 +58,7 @@ export function filterRecords(
 
 export function getGreeting(): string {
   const now = new Date();
-  const hour = now.getHours();
+  const hour = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
-  const time = `${hour}:${minutes}`;
-  
-  if (hour < 12) {
-    return `ደህና አደርክ • ${time}`;
-  } else if (hour < 18) {
-    return `ደህና አደርክ • ${time}`;
-  } else {
-    return `ደህና አደርክ • ${time}`;
-  }
+  return `${hour}:${minutes}`;
 }

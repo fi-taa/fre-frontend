@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { getGreeting } from '@/lib/data-utils';
 import {
   DropdownMenu,
@@ -26,7 +27,16 @@ export function DashboardHeader({
   onNotifications,
   notificationCount = 0,
 }: DashboardHeaderProps) {
-  const greeting = getGreeting();
+  const [greeting, setGreeting] = useState('00:00');
+
+  useEffect(() => {
+    setGreeting(getGreeting());
+    const interval = setInterval(() => {
+      setGreeting(getGreeting());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="bg-bg-beige text-text-primary relative overflow-hidden border-b border-border/30">
