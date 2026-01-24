@@ -23,11 +23,18 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
   const [statusFilter, setStatusFilter] = useState<AttendanceStatus | 'all'>('all');
   const [eventFilter, setEventFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState('');
-  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const { attendances, isLoading } = useAttendance(recordId);
   const allEvents = getEvents();
   const records = getRecords();
   const record = records.find((r) => r.id === recordId);
+
+  const hasActiveFilters = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== '';
+  const activeFilterCount = [
+    statusFilter !== 'all',
+    eventFilter !== 'all',
+    dateFilter !== '',
+  ].filter(Boolean).length;
 
   const events = useMemo(() => {
     if (!record) return allEvents;
@@ -152,102 +159,95 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 mb-4">
-            <div>
-              <label htmlFor="statusFilter" className="block text-xs font-medium mb-1 text-text-secondary">
-                Status
-              </label>
-              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AttendanceStatus | 'all')}>
-                <SelectTrigger id="statusFilter" className="h-8 text-xs">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
-                  <SelectItem value="present" className="text-xs">Present</SelectItem>
-                  <SelectItem value="absent" className="text-xs">Absent</SelectItem>
-                  <SelectItem value="late" className="text-xs">Late</SelectItem>
-                  <SelectItem value="excused" className="text-xs">Excused</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <label htmlFor="eventFilter" className="block text-xs font-medium mb-1 text-text-secondary">
-                Event
-              </label>
-              <Select value={eventFilter} onValueChange={setEventFilter}>
-                <SelectTrigger id="eventFilter" className="h-8 text-xs">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all" className="text-xs">All Events</SelectItem>
-                  {events.length > 0 ? (
-                    events.map((event) => (
-                      <SelectItem key={event.id} value={event.id} className="text-xs">
-                        {event.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="none" disabled className="text-xs">
-                      No events
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <button
-                onClick={() => setShowDateFilter(!showDateFilter)}
-                className={`w-full h-8 px-2 flex items-center justify-between text-xs font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
-                  showDateFilter || dateFilter
-                    ? 'bg-accent text-text-light border-accent'
-                    : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
-                }`}
-              >
-                <span>Date {dateFilter && `(${new Date(dateFilter).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className={`transition-transform duration-200 ${showDateFilter ? 'rotate-180' : ''}`}
-                >
-                  <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {showDateFilter && (
-            <div className="mb-4 p-2.5 bg-bg-beige-light rounded-lg border border-border/30">
-              <input
-                id="dateFilter"
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full h-8 px-2 text-xs border border-border/40 rounded-lg bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
-              />
-            </div>
-          )}
-
-          {(statusFilter !== 'all' || eventFilter !== 'all' || dateFilter) && (
-            <div className="mb-4">
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
+                showFilters || hasActiveFilters
+                  ? 'bg-accent text-text-light border-accent'
+                  : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
+              }`}
+            >
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 text-[10px] rounded-full bg-text-light/20">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+            {hasActiveFilters && (
               <button
                 onClick={() => {
                   setStatusFilter('all');
                   setEventFilter('all');
                   setDateFilter('');
                 }}
-                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary"
+                className="px-3 py-2 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary"
               >
-                Clear Filters
+                Clear
               </button>
+            )}
+          </div>
+
+          {showFilters && (
+            <div className="bg-bg-beige-light rounded-lg border border-border/30 p-3 space-y-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="statusFilter" className="block text-xs font-medium mb-1.5 text-text-secondary">
+                    Status
+                  </label>
+                  <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AttendanceStatus | 'all')}>
+                    <SelectTrigger id="statusFilter" className="h-8 text-xs">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
+                      <SelectItem value="present" className="text-xs">Present</SelectItem>
+                      <SelectItem value="absent" className="text-xs">Absent</SelectItem>
+                      <SelectItem value="late" className="text-xs">Late</SelectItem>
+                      <SelectItem value="excused" className="text-xs">Excused</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label htmlFor="eventFilter" className="block text-xs font-medium mb-1.5 text-text-secondary">
+                    Event
+                  </label>
+                  <Select value={eventFilter} onValueChange={setEventFilter}>
+                    <SelectTrigger id="eventFilter" className="h-8 text-xs">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all" className="text-xs">All Events</SelectItem>
+                      {events.length > 0 ? (
+                        events.map((event) => (
+                          <SelectItem key={event.id} value={event.id} className="text-xs">
+                            {event.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled className="text-xs">
+                          No events
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-border/30">
+                <label htmlFor="dateFilter" className="block text-xs font-medium mb-1.5 text-text-secondary">
+                  Date
+                </label>
+                <input
+                  id="dateFilter"
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="w-full h-8 px-2 text-xs border border-border/40 rounded-lg bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
+                />
+              </div>
             </div>
           )}
         </div>
