@@ -73,7 +73,7 @@ const SelectContent = React.forwardRef<
       <SelectPrimitive.Viewport
         className={`p-1 ${
           position === 'popper' &&
-          'h-[var(--radix-select-trigger-height)] w-[var(--radix-select-trigger-width)]'
+          'h-(--radix-select-trigger-height) w-(--radix-select-trigger-width)'
         }`}
       >
         {children}
@@ -102,7 +102,7 @@ const SelectItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <SelectPrimitive.Item
     ref={ref}
-    className={`relative flex w-full cursor-default select-none items-start rounded-sm py-2 pl-8 pr-2 text-sm outline-none focus:bg-bg-beige-light focus:text-text-primary data-[disabled]:pointer-events-none data-[disabled]:opacity-50 transition-colors duration-200 ${className || ''}`}
+    className={`relative flex w-full cursor-default select-none items-start rounded-sm py-2 pl-8 pr-2 text-sm outline-none focus:bg-bg-beige-light focus:text-text-primary data-disabled:pointer-events-none data-disabled:opacity-50 transition-colors duration-200 ${className || ''}`}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center mt-0.5">
@@ -111,7 +111,7 @@ const SelectItem = React.forwardRef<
       </SelectPrimitive.ItemIndicator>
     </span>
 
-    <SelectPrimitive.ItemText className="break-words whitespace-normal">
+    <SelectPrimitive.ItemText className="wrap-break-word whitespace-normal">
       {children}
     </SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
