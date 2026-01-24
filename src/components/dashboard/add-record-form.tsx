@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { RecordCategory } from '@/types';
+import type { RecordCategory, Record } from '@/types';
 
 interface AddRecordFormProps {
   onCancel: () => void;
@@ -28,14 +28,14 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
   const [currentSection, setCurrentSection] = useState(1);
   const [category, setCategory] = useState<RecordCategory>('ሰራተኛ');
   const [debir, setDebir] = useState('');
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [error, setError] = useState('');
 
   const formConfig = useMemo(() => getFormConfigByCategory(category), [category]);
   const totalSections = formConfig.sections.length + 1;
 
   function updateField(fieldId: string, value: string) {
-    setFormData((prev) => ({
+    setFormData((prev: { [key: string]: string }) => ({
       ...prev,
       [fieldId]: value,
     }));
@@ -99,12 +99,13 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
       return;
     }
 
-    const newRecord = {
+    const newRecord: Record = {
       id: crypto.randomUUID(),
       name: name.trim(),
       church: debir.trim(),
       age,
       category,
+      ...formData,
     };
 
     saveRecord(newRecord);

@@ -54,12 +54,21 @@ export default function DashboardPage() {
     router.push('/login');
   }
 
-  function handleBack() {
-    router.push('/');
+  function handleProfile() {
+    router.push('/dashboard/profile');
   }
 
-  function handleAddClick() {
+  function handleSettings() {
+    // TODO: Implement settings functionality
+    console.log('Settings clicked');
+  }
+
+  function handleAddRecord() {
     router.push('/dashboard/add');
+  }
+
+  function handleAttendance() {
+    router.push('/dashboard/attendance');
   }
 
   function handleNotifications() {
@@ -71,8 +80,7 @@ export default function DashboardPage() {
   }
 
   function handleViewRecord(record: Record) {
-    // TODO: Implement view record functionality
-    console.log('View record:', record);
+    router.push(`/dashboard/records/${record.id}`);
   }
 
   if (isLoading || dataLoading) {
@@ -98,8 +106,11 @@ export default function DashboardPage() {
       />
       <div className="relative z-10">
         <DashboardHeader
-          onBack={handleBack}
-          onAdd={handleAddClick}
+          onProfile={handleProfile}
+          onSettings={handleSettings}
+          onLogout={handleLogout}
+          onAddRecord={handleAddRecord}
+          onAttendance={handleAttendance}
           onNotifications={handleNotifications}
           notificationCount={0}
         />
