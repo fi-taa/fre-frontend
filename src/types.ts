@@ -6,6 +6,33 @@ export type SortDirection = 'asc' | 'desc';
 
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 
+export type UserRole = 'super_admin' | 'admin' | 'manager' | 'staff';
+
+export interface User {
+  id: number;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  is_active: boolean;
+  department_ids: number[];
+}
+
+export interface UserCreate {
+  email: string;
+  full_name: string;
+  password: string;
+  role: UserRole;
+  department_ids: number[];
+}
+
+export interface UserUpdate {
+  email?: string;
+  full_name?: string;
+  role?: UserRole;
+  is_active?: boolean;
+  department_ids?: number[];
+}
+
 export interface Record {
   id: string;
   name: string;
