@@ -2,18 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, logout } from '@/lib/auth';
+import { useSelector, useDispatch } from 'react-redux';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { usePagination } from '@/hooks/use-pagination';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { TabNavigation } from '@/components/dashboard/tab-navigation';
 import { SearchBar } from '@/components/dashboard/search-bar';
 import { DataTable } from '@/components/dashboard/data-table';
-import type { Record } from '@/types';
+import { clearAuth } from '@/store/slices/authSlice';
+import type { RootState } from '@/store/store';
+import type { PersonRecord } from '@/types';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [isLoading, setIsLoading] = useState(true);
 
   const {
@@ -40,17 +43,15 @@ export default function DashboardPage() {
   } = usePagination({ data: filteredRecords });
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
+    if (!isAuthenticated) {
       router.push('/login');
       return;
     }
-    setUser(currentUser);
     setIsLoading(false);
-  }, [router]);
+  }, [isAuthenticated, router]);
 
   function handleLogout() {
-    logout();
+    dispatch(clearAuth());
     router.push('/login');
   }
 
@@ -59,7 +60,6 @@ export default function DashboardPage() {
   }
 
   function handleSettings() {
-    // TODO: Implement settings functionality
     console.log('Settings clicked');
   }
 
@@ -79,7 +79,7 @@ export default function DashboardPage() {
     // TODO: Implement filter functionality
   }
 
-  function handleViewRecord(record: Record) {
+  function handleViewRecord(record: PersonRecord) {
     router.push(`/dashboard/records/${record.id}`);
   }
 
@@ -91,7 +91,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return null;
   }
 
