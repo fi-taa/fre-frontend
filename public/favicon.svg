@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="#8B7355" opacity="0.1"/>
+  
+  <!-- Main icon: attendance/people tracking -->
+  <!-- Person silhouette -->
+  <circle cx="50" cy="25" r="8" fill="#8B7355"/>
+  <path d="M 35 35 L 35 50 L 40 50 L 40 60 L 45 60 L 45 50 L 55 50 L 55 60 L 60 60 L 60 50 L 65 50 L 65 35 Q 65 32 62 32 L 38 32 Q 35 32 35 35 Z" fill="#8B7355"/>
+  
+  <!-- Checkmark overlay (attendance marking) -->
+  <g transform="translate(65, 65)">
+    <circle r="12" fill="#4CAF50" opacity="0.8"/>
+    <path d="M -5 0 L 0 5 L 6 -2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Text: F for FitAA FRE -->
+  <text x="50" y="85" font-size="18" font-weight="bold" text-anchor="middle" fill="#8B7355" font-family="Arial, sans-serif">FRE</text>
+</svg>
