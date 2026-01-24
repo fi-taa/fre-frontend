@@ -1,4 +1,4 @@
-import { fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import { fetchBaseQuery, FetchBaseQueryError, BaseQueryFn, FetchArgs } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/store/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fre-form.onrender.com/api/v1';
@@ -6,11 +6,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fre-form.onrender.co
 export const baseQuery = fetchBaseQuery({
   baseUrl: API_URL,
   prepareHeaders: (headers, { getState }) => {
-    const state = getState() as RootState;
-    const token = state.auth.access_token;
-
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+    const state: unknown = getState();
+    if (state && typeof state === 'object' && 'auth' in state) {
+      const authState = (state as { auth: { access_token?: string } }).auth;
+      const token = authState?.access_token;
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
     }
 
     headers.set('Content-Type', 'application/json');
@@ -18,12 +20,16 @@ export const baseQuery = fetchBaseQuery({
   },
 });
 
-export const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
+export const baseQueryWithReauth: BaseQueryFn<FetchArgs | string, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error) {
     const error = result.error as FetchBaseQueryError;
-    
+
     // Handle 401 Unauthorized
     if (error.status === 401) {
       // Token expired or invalid
