@@ -15,7 +15,9 @@ export const baseQuery = fetchBaseQuery({
       }
     }
 
-    headers.set('Content-Type', 'application/json');
+    if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
     return headers;
   },
 });

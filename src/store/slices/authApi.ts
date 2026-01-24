@@ -17,11 +17,25 @@ export const authApi = createApi({
         client_secret?: string;
       }
     >({
-      query: (body) => ({
-        url: '/auth/login',
-        method: 'POST',
-        body,
-      }),
+      query: (body) => {
+        const params = new URLSearchParams();
+        params.append('grant_type', body.grant_type || 'password');
+        params.append('username', body.username);
+        params.append('password', body.password);
+        
+        if (body.scope) params.append('scope', body.scope);
+        if (body.client_id) params.append('client_id', body.client_id);
+        if (body.client_secret) params.append('client_secret', body.client_secret);
+
+        return {
+          url: '/auth/login',
+          method: 'POST',
+          body: params.toString(),
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        };
+      },
     }),
   }),
 });
