@@ -50,7 +50,19 @@ export function LoginForm() {
         
         // Check for backend error response
         if (error.data?.detail) {
-          errorMessage = error.data.detail;
+          const detail = error.data.detail;
+          // Handle array of validation errors
+          if (Array.isArray(detail)) {
+            errorMessage = detail.map((e: any) => e.msg || String(e)).join(', ');
+          }
+          // Handle string detail
+          else if (typeof detail === 'string') {
+            errorMessage = detail;
+          }
+          // Handle object detail
+          else if (detail && typeof detail === 'object' && 'msg' in detail) {
+            errorMessage = detail.msg;
+          }
         } else if (error.data?.message) {
           errorMessage = error.data.message;
         } 
