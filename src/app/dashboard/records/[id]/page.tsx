@@ -112,15 +112,15 @@ export default function RecordDetailsPage() {
         />
       </div>
       <div className="flex-1 overflow-auto relative z-10">
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="max-w-4xl mx-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
+            className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary transition-colors duration-200"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -131,7 +131,7 @@ export default function RecordDetailsPage() {
               <path d="m12 19-7-7 7-7" />
               <path d="M19 12H5" />
             </svg>
-            Back to Dashboard
+            Back
           </button>
           <RecordDetails record={record} onEdit={handleEdit} onDelete={handleDelete} />
           <AttendanceHistory recordId={recordId} onTakeAttendance={handleTakeAttendance} />
