@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { findUserByCodeId, getUsers } from '@/lib/storage';
+import { findUserByUsername, getUsers } from '@/lib/storage';
 import type { User } from '@/types';
 
 interface ProfileViewProps {
@@ -36,14 +36,14 @@ export function ProfileView({ user }: ProfileViewProps) {
       return;
     }
 
-    const foundUser = findUserByCodeId(user.codeId);
+    const foundUser = findUserByUsername(user.username);
     if (!foundUser || foundUser.password !== currentPassword) {
       setError('Current password is incorrect');
       return;
     }
 
     const users = getUsers();
-    const userIndex = users.findIndex((u) => u.codeId === user.codeId);
+    const userIndex = users.findIndex((u) => u.username === user.username);
     if (userIndex !== -1) {
       users[userIndex] = { ...users[userIndex], password: newPassword };
       localStorage.setItem('users', JSON.stringify(users));
@@ -63,8 +63,8 @@ export function ProfileView({ user }: ProfileViewProps) {
       <div className="p-6 space-y-6">
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-text-secondary">Code ID</label>
-            <div className="mt-1 text-text-primary font-mono">{user.codeId}</div>
+            <label className="text-sm font-medium text-text-secondary">Username</label>
+            <div className="mt-1 text-text-primary font-mono">{user.username}</div>
           </div>
         </div>
 

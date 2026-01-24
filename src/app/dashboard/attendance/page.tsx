@@ -13,7 +13,7 @@ type Tab = 'take' | 'view' | 'events';
 export default function AttendancePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [user, setUser] = useState<{ codeId: string } | null>(null);
+  const [user, setUser] = useState<{ username: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('take');
   const recordIdParam = searchParams.get('recordId');

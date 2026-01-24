@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 export function LoginForm() {
   const router = useRouter();
-  const [codeId, setCodeId] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ export function LoginForm() {
     setError('');
     setIsLoading(true);
 
-    const result = login(codeId.trim(), password);
+    const result = login(username.trim(), password);
 
     if (!result.success) {
       setError(result.error || 'Login failed');
@@ -34,18 +34,18 @@ export function LoginForm() {
       <div className="space-y-4">
         <div>
           <label
-            htmlFor="codeId"
+            htmlFor="username"
             className="block text-sm font-medium mb-2 text-text-primary"
           >
-            Code ID
+            Username
           </label>
           <input
-            id="codeId"
+            id="username"
             type="text"
-            value={codeId}
-            onChange={(e) => setCodeId(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full min-h-[44px] px-4 rounded-lg border border-border bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
-            placeholder="Enter your code ID"
+            placeholder="Enter your username"
             required
             disabled={isLoading}
           />

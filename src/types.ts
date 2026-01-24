@@ -68,7 +68,7 @@ export interface Record {
 }
 
 export interface User {
-  codeId: string;
+  username: string;
   password: string;
 }
 

@@ -13,7 +13,7 @@ import type { Record } from '@/types';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ codeId: string } | null>(null);
+  const [user, setUser] = useState<{ username: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const {

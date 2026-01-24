@@ -15,7 +15,7 @@ export default function RecordDetailsPage() {
   const recordId = params.id as string;
   const [record, setRecord] = useState<Record | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<{ codeId: string } | null>(null);
+  const [user, setUser] = useState<{ username: string } | null>(null);
 
   useEffect(() => {
     const currentUser = getCurrentUser();

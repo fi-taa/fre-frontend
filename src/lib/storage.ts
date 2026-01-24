@@ -33,9 +33,9 @@ export function saveUser(user: User): void {
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
 }
 
-export function findUserByCodeId(codeId: string): User | undefined {
+export function findUserByUsername(username: string): User | undefined {
   const users = getUsers();
-  return users.find((user) => user.codeId === codeId);
+  return users.find((user) => user.username === username);
 }
 
 export function getRecords(category?: RecordCategory): Record[] {
