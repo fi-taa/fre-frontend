@@ -19,7 +19,7 @@ export function TabNavigation({
           <button
             key={category}
             onClick={() => onCategoryChange(isSelected ? null : category)}
-            className={`flex-1 py-4 px-3 text-sm font-semibold transition-colors duration-200 relative ${
+            className={`flex-1 py-2.5 px-2 text-xs font-semibold transition-colors duration-200 relative ${
               isSelected
                 ? 'bg-accent text-text-light'
                 : 'text-text-secondary hover:text-text-primary hover:bg-bg-beige-light'

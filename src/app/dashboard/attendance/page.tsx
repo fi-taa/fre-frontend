@@ -119,7 +119,7 @@ export default function AttendancePage() {
             <div className="flex border-b border-border/30">
               <button
                 onClick={() => setActiveTab('take')}
-                className={`px-6 py-3 text-sm font-medium transition-colors duration-200 ${
+                className={`px-3 py-2 text-xs font-medium transition-colors duration-200 ${
                   activeTab === 'take'
                     ? 'bg-accent text-text-light border-b-2 border-accent'
                     : 'text-text-secondary hover:text-text-primary hover:bg-bg-beige-light'
@@ -129,7 +129,7 @@ export default function AttendancePage() {
               </button>
               <button
                 onClick={() => setActiveTab('view')}
-                className={`px-6 py-3 text-sm font-medium transition-colors duration-200 ${
+                className={`px-3 py-2 text-xs font-medium transition-colors duration-200 ${
                   activeTab === 'view'
                     ? 'bg-accent text-text-light border-b-2 border-accent'
                     : 'text-text-secondary hover:text-text-primary hover:bg-bg-beige-light'
@@ -139,7 +139,7 @@ export default function AttendancePage() {
               </button>
               <button
                 onClick={() => setActiveTab('events')}
-                className={`px-6 py-3 text-sm font-medium transition-colors duration-200 ${
+                className={`px-3 py-2 text-xs font-medium transition-colors duration-200 ${
                   activeTab === 'events'
                     ? 'bg-accent text-text-light border-b-2 border-accent'
                     : 'text-text-secondary hover:text-text-primary hover:bg-bg-beige-light'
@@ -148,7 +148,7 @@ export default function AttendancePage() {
                 Manage Events
               </button>
             </div>
-            <div className="p-6">
+            <div className="p-4">
               {activeTab === 'take' && (
                 <AttendanceForm onSuccess={handleSuccess} initialRecordId={recordIdParam || undefined} />
               )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { useEvents } from '@/hooks/use-events';
 import {
   Select,
@@ -75,16 +76,16 @@ export function EventManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-text-primary">Manage Events</h3>
-        <div className="flex items-center gap-4">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h3 className="text-sm font-semibold text-text-primary">Manage Events</h3>
+        <div className="flex items-center gap-2">
           <Select
             value={selectedCategory}
             onValueChange={(value) => setSelectedCategory(value as RecordCategory | 'all')}
           >
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filter by category" />
+            <SelectTrigger className="w-24 text-xs h-8 min-h-[32px]">
+              <SelectValue placeholder="Filter" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
@@ -101,21 +102,22 @@ export function EventManagement() {
               setEditingEvent(null);
               setFormData({ name: '', category: 'ሰራተኛ', description: '' });
             }}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30"
+            className="p-1.5 rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 flex items-center justify-center"
+            aria-label="Add Event"
           >
-            Add Event
+            <Plus className="h-4 w-4" />
           </button>
         </div>
       </div>
 
       {showForm && (
-        <div className="bg-card rounded-lg border border-border/30 p-6">
-          <h4 className="text-md font-semibold text-text-primary mb-4">
+        <div className="bg-card rounded-lg border border-border/30 p-4">
+          <h4 className="text-sm font-semibold text-text-primary mb-3">
             {editingEvent ? 'Edit Event' : 'Create New Event'}
           </h4>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label htmlFor="eventName" className="block text-sm font-medium mb-2 text-text-primary">
+              <label htmlFor="eventName" className="block text-xs font-medium mb-1.5 text-text-primary">
                 Event Name <span className="text-error">*</span>
               </label>
               <input
@@ -128,7 +130,7 @@ export function EventManagement() {
               />
             </div>
             <div>
-              <label htmlFor="eventCategory" className="block text-sm font-medium mb-2 text-text-primary">
+              <label htmlFor="eventCategory" className="block text-xs font-medium mb-1.5 text-text-primary">
                 Category <span className="text-error">*</span>
               </label>
               <Select
@@ -149,7 +151,7 @@ export function EventManagement() {
               </Select>
             </div>
             <div>
-              <label htmlFor="eventDescription" className="block text-sm font-medium mb-2 text-text-primary">
+              <label htmlFor="eventDescription" className="block text-xs font-medium mb-1.5 text-text-primary">
                 Description
               </label>
               <textarea
@@ -163,14 +165,14 @@ export function EventManagement() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30"
               >
                 {editingEvent ? 'Update' : 'Create'}
               </button>
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary"
               >
                 Cancel
               </button>
