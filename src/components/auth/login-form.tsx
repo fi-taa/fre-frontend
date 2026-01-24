@@ -2,31 +2,52 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/lib/auth';
+import { useDispatch } from 'react-redux';
+import { useLoginMutation } from '@/store/slices/authApi';
+import { setAuthToken } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/button';
 
 export function LoginForm() {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const [login, { isLoading }] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
 
-    const result = login(username.trim(), password);
-
-    if (!result.success) {
-      setError(result.error || 'Login failed');
-      setIsLoading(false);
+    if (!username.trim()) {
+      setError('Username is required');
       return;
     }
 
-    router.push('/dashboard');
+    if (!password) {
+      setError('Password is required');
+      return;
+    }
+
+    try {
+      const response = await login({
+        username: username.trim(),
+        password,
+      }).unwrap();
+
+      dispatch(setAuthToken({
+        access_token: response.access_token,
+        token_type: response.token_type,
+      }));
+
+      router.push('/dashboard');
+    } catch (err) {
+      const errorMessage = err instanceof Object && 'data' in err 
+        ? (err.data as { detail?: string }).detail || 'Login failed'
+        : 'Login failed. Please try again.';
+      setError(errorMessage);
+    }
   }
 
   return (
