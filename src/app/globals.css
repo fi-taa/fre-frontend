@@ -9,6 +9,15 @@
   --color-link: #1A73E8;
   --color-error: #D93025;
   --color-border: #DDDDDD;
+  --color-header-dark: #1A1A1A;
+  --color-accent-purple: #5B48B3;
+  --color-content-bg: #F9FAFB;
+  --color-text-light: #FFFFFF;
+  --color-text-muted: #999999;
+  --color-bg-beige: #F5F5F0;
+  --color-bg-beige-light: #FAFAF5;
+  --color-table-header: #F0F0EB;
+  --color-table-row-alt: #F8F8F3;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

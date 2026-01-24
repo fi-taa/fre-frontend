@@ -3,12 +3,41 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, logout } from '@/lib/auth';
-import { Button } from '@/components/ui/button';
+import { useDashboardData } from '@/hooks/use-dashboard-data';
+import { usePagination } from '@/hooks/use-pagination';
+import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { TabNavigation } from '@/components/dashboard/tab-navigation';
+import { SearchBar } from '@/components/dashboard/search-bar';
+import { DataTable } from '@/components/dashboard/data-table';
+import type { Record } from '@/types';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<{ codeId: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    filteredRecords,
+    selectedCategory,
+    searchTerm,
+    sortField,
+    sortDirection,
+    isLoading: dataLoading,
+    setSelectedCategory,
+    setSearchTerm,
+    handleSort,
+    handleDelete,
+  } = useDashboardData();
+
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    nextPage,
+    previousPage,
+    canGoNext,
+    canGoPrevious,
+  } = usePagination({ data: filteredRecords });
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -25,9 +54,30 @@ export default function DashboardPage() {
     router.push('/login');
   }
 
-  if (isLoading) {
+  function handleBack() {
+    router.push('/');
+  }
+
+  function handleAddClick() {
+    router.push('/dashboard/add');
+  }
+
+  function handleNotifications() {
+    // TODO: Implement notifications functionality
+  }
+
+  function handleFilter() {
+    // TODO: Implement filter functionality
+  }
+
+  function handleViewRecord(record: Record) {
+    // TODO: Implement view record functionality
+    console.log('View record:', record);
+  }
+
+  if (isLoading || dataLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-bg-light">
         <div className="text-text-primary">Loading...</div>
       </div>
     );
@@ -38,20 +88,51 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md space-y-8 bg-card rounded-lg p-6 sm:p-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-semibold text-text-primary">Dashboard</h1>
-          <div className="space-y-2 p-6 rounded-lg border border-border bg-bg-light">
-            <p className="text-sm text-text-secondary">Code ID</p>
-            <p className="text-lg font-mono text-text-primary break-all">
-              {user.codeId}
-            </p>
-          </div>
+    <div className="min-h-screen bg-bg-beige flex flex-col relative">
+      <div
+        className="fixed inset-0 opacity-[0.02] pointer-events-none z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+      <div className="relative z-10">
+        <DashboardHeader
+          onBack={handleBack}
+          onAdd={handleAddClick}
+          onNotifications={handleNotifications}
+          notificationCount={0}
+        />
+        <div className="bg-card border-b border-border/30">
+          <TabNavigation
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onDelete={() => {}}
+            onFilter={handleFilter}
+            hasSelection={false}
+          />
         </div>
-        <Button variant="secondary" onClick={handleLogout}>
-          Logout
-        </Button>
+      </div>
+      <div className="flex-1 overflow-auto relative z-10">
+        <div className="max-w-full mx-auto">
+          <DataTable
+            records={paginatedData}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            onView={handleViewRecord}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPrevious={previousPage}
+            onNext={nextPage}
+            canGoPrevious={canGoPrevious}
+            canGoNext={canGoNext}
+          />
+        </div>
       </div>
     </div>
   );

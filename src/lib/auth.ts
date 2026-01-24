@@ -1,11 +1,7 @@
 import { getUsers, saveUser, findUserByCodeId } from './storage';
+import type { User } from '@/types';
 
 const SESSION_KEY = 'currentUser';
-
-export interface User {
-  codeId: string;
-  password: string;
-}
 
 export function generateCodeId(): string {
   return crypto.randomUUID();
