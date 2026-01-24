@@ -33,6 +33,22 @@ export interface UserUpdate {
   department_ids?: number[];
 }
 
+export interface Department {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface DepartmentCreate {
+  name: string;
+  description?: string;
+}
+
+export interface DepartmentUpdate {
+  name?: string;
+  description?: string;
+}
+
 export interface Student {
   id: number;
   name: string;
