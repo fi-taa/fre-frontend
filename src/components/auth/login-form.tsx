@@ -48,11 +48,18 @@ export function LoginForm() {
       if (err && typeof err === 'object') {
         const error = err as any;
         
+        // Check for backend error response
         if (error.data?.detail) {
           errorMessage = error.data.detail;
         } else if (error.data?.message) {
           errorMessage = error.data.message;
-        } else if (error.status) {
+        } 
+        // Check for network/request errors
+        else if (error.status === undefined) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        }
+        // HTTP status codes
+        else if (error.status) {
           const statusMessages: Record<number, string> = {
             400: 'Invalid request. Please check your inputs.',
             401: 'Incorrect email or password',
