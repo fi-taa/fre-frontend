@@ -33,6 +33,43 @@ export interface UserUpdate {
   department_ids?: number[];
 }
 
+export interface Student {
+  id: number;
+  name: string;
+  age: number;
+  sex: string;
+  education_level: string;
+  photo_url?: string;
+  family_profile?: Record<string, unknown>;
+  phone?: string;
+  department_id: number;
+  created_by_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StudentCreate {
+  name: string;
+  age: number;
+  sex: string;
+  education_level: string;
+  photo_url?: string;
+  family_profile?: Record<string, unknown>;
+  phone?: string;
+  department_id: number;
+}
+
+export interface StudentUpdate {
+  name?: string;
+  age?: number;
+  sex?: string;
+  education_level?: string;
+  photo_url?: string;
+  family_profile?: Record<string, unknown>;
+  phone?: string;
+  department_id?: number;
+}
+
 export interface Record {
   id: string;
   name: string;

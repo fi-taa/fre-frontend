@@ -1,11 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/store/baseQuery';
-import type { User, UserCreate, UserUpdate } from '@/types';
+import type { User, UserCreate, UserUpdate, Student, StudentCreate, StudentUpdate } from '@/types';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['User', 'Record', 'Event', 'Attendance'],
+  tagTypes: ['User', 'Student', 'Record', 'Event', 'Attendance'],
   endpoints: (builder) => ({
     // Auth endpoints
     login: builder.mutation<
@@ -93,6 +93,43 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['User'],
     }),
+
+    // Student endpoints
+    createStudent: builder.mutation<{ data: Student }, StudentCreate>({
+      query: (body) => ({
+        url: '/students/',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Student'],
+    }),
+
+    listStudents: builder.query<{ data: Student[] }, void>({
+      query: () => '/students/',
+      providesTags: ['Student'],
+    }),
+
+    getStudent: builder.query<{ data: Student }, number>({
+      query: (studentId) => `/students/${studentId}`,
+      providesTags: ['Student'],
+    }),
+
+    updateStudent: builder.mutation<{ data: Student }, { studentId: number; body: StudentUpdate }>({
+      query: ({ studentId, body }) => ({
+        url: `/students/${studentId}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['Student'],
+    }),
+
+    deleteStudent: builder.mutation<void, number>({
+      query: (studentId) => ({
+        url: `/students/${studentId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Student'],
+    }),
   }),
 });
 
@@ -107,4 +144,9 @@ export const {
   useUpdateUserMutation,
   useDeleteUserMutation,
   useDeleteAdminMutation,
+  useCreateStudentMutation,
+  useListStudentsQuery,
+  useGetStudentQuery,
+  useUpdateStudentMutation,
+  useDeleteStudentMutation,
 } = apiSlice;
