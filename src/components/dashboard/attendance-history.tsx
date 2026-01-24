@@ -23,6 +23,7 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
   const [statusFilter, setStatusFilter] = useState<AttendanceStatus | 'all'>('all');
   const [eventFilter, setEventFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState('');
+  const [showDateFilter, setShowDateFilter] = useState(false);
   const { attendances, isLoading } = useAttendance(recordId);
   const allEvents = getEvents();
   const records = getRecords();
@@ -196,18 +197,44 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
             </div>
 
             <div>
-              <label htmlFor="dateFilter" className="block text-xs font-medium mb-1 text-text-secondary">
-                Date
-              </label>
+              <button
+                onClick={() => setShowDateFilter(!showDateFilter)}
+                className={`w-full h-8 px-2 flex items-center justify-between text-xs font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
+                  showDateFilter || dateFilter
+                    ? 'bg-accent text-text-light border-accent'
+                    : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
+                }`}
+              >
+                <span>Date {dateFilter && `(${new Date(dateFilter).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform duration-200 ${showDateFilter ? 'rotate-180' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {showDateFilter && (
+            <div className="mb-4 p-2.5 bg-bg-beige-light rounded-lg border border-border/30">
               <input
                 id="dateFilter"
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full h-8 px-2 text-xs border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
+                className="w-full h-8 px-2 text-xs border border-border/40 rounded-lg bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               />
             </div>
-          </div>
+          )}
 
           {(statusFilter !== 'all' || eventFilter !== 'all' || dateFilter) && (
             <div className="mb-4">
