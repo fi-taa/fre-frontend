@@ -1,5 +1,5 @@
-import { getUsers, saveUser, findUserByUsername } from './storage';
-import type { User } from '@/types';
+import { saveUser, findUserByUsername } from './storage';
+import type { LocalAuthUser } from '@/types';
 
 const SESSION_KEY = 'currentUser';
 
@@ -25,7 +25,7 @@ export function signUp(username: string, password: string): { success: boolean; 
     return { success: false, error: 'Username already exists' };
   }
 
-  const newUser: User = { username: username.trim(), password };
+  const newUser: LocalAuthUser = { username: username.trim(), password };
   saveUser(newUser);
   
   if (typeof window !== 'undefined') {
@@ -60,7 +60,7 @@ export function login(username: string, password: string): { success: boolean; e
   return { success: true };
 }
 
-export function getCurrentUser(): User | null {
+export function getCurrentUser(): LocalAuthUser | null {
   if (typeof window === 'undefined') {
     return null;
   }

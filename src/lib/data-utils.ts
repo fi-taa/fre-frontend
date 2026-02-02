@@ -1,10 +1,10 @@
-import type { Record, RecordCategory, SortField, SortDirection } from '@/types';
+import type { PersonRecord, RecordCategory, SortField, SortDirection } from '@/types';
 
 export function sortRecords(
-  records: Record[],
+  records: PersonRecord[],
   field: SortField,
   direction: SortDirection
-): Record[] {
+): PersonRecord[] {
   const sorted = [...records].sort((a, b) => {
     let aValue: string | number;
     let bValue: string | number;
@@ -33,10 +33,10 @@ export function sortRecords(
 }
 
 export function filterRecords(
-  records: Record[],
+  records: PersonRecord[],
   category: RecordCategory | null,
   searchTerm: string
-): Record[] {
+): PersonRecord[] {
   let filtered = records;
 
   if (category) {

@@ -1,13 +1,13 @@
 import { TableRow } from './table-row';
 import { PaginationControls } from './pagination-controls';
-import type { Record, SortField } from '@/types';
+import type { PersonRecord, SortField } from '@/types';
 
 interface DataTableProps {
-  records: Record[];
+  records: PersonRecord[];
   sortField: SortField | null;
   sortDirection: 'asc' | 'desc';
   onSort: (field: SortField) => void;
-  onView?: (record: Record) => void;
+  onView?: (record: PersonRecord) => void;
   currentPage: number;
   totalPages: number;
   onPrevious: () => void;

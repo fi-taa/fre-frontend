@@ -10,9 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
-
-const categories: RecordCategory[] = ['ሰራተኛ', 'ወጣት', 'አዳጊ', 'ህጻናት'];
 
 export function EventManagement() {
   const [selectedCategory, setSelectedCategory] = useState<RecordCategory | 'all'>('all');
@@ -20,7 +19,7 @@ export function EventManagement() {
   const [editingEvent, setEditingEvent] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    category: 'ሰራተኛ' as RecordCategory,
+    category: 'adult' as RecordCategory,
     description: '',
   });
   const { events, addEvent, updateEventById, removeEvent } = useEvents();
@@ -45,7 +44,7 @@ export function EventManagement() {
       });
     }
 
-    setFormData({ name: '', category: 'ሰራተኛ', description: '' });
+    setFormData({ name: '', category: 'adult', description: '' });
     setShowForm(false);
     setEditingEvent(null);
   }
@@ -70,7 +69,7 @@ export function EventManagement() {
   }
 
   function handleCancel() {
-    setFormData({ name: '', category: 'ሰራተኛ', description: '' });
+    setFormData({ name: '', category: 'adult', description: '' });
     setShowForm(false);
     setEditingEvent(null);
   }
@@ -89,9 +88,9 @@ export function EventManagement() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
+              {RECORD_CATEGORIES.map((cat) => (
                 <SelectItem key={cat} value={cat}>
-                  {cat}
+                  {CATEGORY_LABELS[cat]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -100,7 +99,7 @@ export function EventManagement() {
             onClick={() => {
               setShowForm(true);
               setEditingEvent(null);
-              setFormData({ name: '', category: 'ሰራተኛ', description: '' });
+              setFormData({ name: '', category: 'adult', description: '' });
             }}
             className="p-1.5 rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 flex items-center justify-center"
             aria-label="Add Event"
@@ -142,9 +141,9 @@ export function EventManagement() {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
+                  {RECORD_CATEGORIES.map((cat) => (
                     <SelectItem key={cat} value={cat}>
-                      {cat}
+                      {CATEGORY_LABELS[cat]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -217,7 +216,7 @@ export function EventManagement() {
                     className="border-b border-border/30 hover:bg-bg-beige-light transition-colors duration-200"
                   >
                     <td className="px-4 py-3 text-sm text-text-primary font-medium">{event.name}</td>
-                    <td className="px-4 py-3 text-sm text-text-primary">{event.category}</td>
+                    <td className="px-4 py-3 text-sm text-text-primary">{CATEGORY_LABELS[event.category]}</td>
                     <td className="px-4 py-3 text-sm text-text-secondary">
                       {event.description || '-'}
                     </td>

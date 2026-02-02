@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { RecordCategory, AttendanceStatus, Record } from '@/types';
+import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
+import type { RecordCategory, AttendanceStatus, PersonRecord } from '@/types';
 
 interface AttendanceFormProps {
   onSuccess: () => void;
@@ -229,7 +230,6 @@ export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: Attenda
     { value: 'excused', label: 'Excused', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200' },
   ];
 
-  const categories: RecordCategory[] = ['ሰራተኛ', 'ወጣት', 'አዳጊ', 'ህጻናት'];
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -339,7 +339,7 @@ export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: Attenda
             )}
             {selectedCategory !== 'all' && (
               <span className="px-2 py-1 bg-accent/10 text-accent rounded-md">
-                {selectedCategory}
+                {CATEGORY_LABELS[selectedCategory]}
               </span>
             )}
             {searchTerm && (
@@ -369,7 +369,7 @@ export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: Attenda
                 <SelectContent>
                   {availableEvents.map((event) => (
                     <SelectItem key={event.id} value={event.id} className="text-xs">
-                      {event.name} ({event.category})
+                      {event.name} ({CATEGORY_LABELS[event.category as RecordCategory]})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -388,7 +388,7 @@ export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: Attenda
               >
                 All
               </button>
-              {categories.map((cat) => (
+              {RECORD_CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
@@ -398,7 +398,7 @@ export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: Attenda
                       : 'bg-bg-beige-light text-text-primary hover:bg-bg-beige-light/80'
                   }`}
                 >
-                  {cat}
+                  {CATEGORY_LABELS[cat]}
                 </button>
               ))}
             </div>
@@ -426,7 +426,7 @@ export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: Attenda
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-medium text-text-primary truncate">{record.name}</div>
                           <div className="text-xs text-text-secondary mt-0.5">
-                            {record.church} • {record.category} • Age {record.age}
+                            {record.church} • {CATEGORY_LABELS[record.category as RecordCategory]} • Age {record.age}
                           </div>
                         </div>
                         {currentStatus && (

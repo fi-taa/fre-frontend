@@ -1,4 +1,20 @@
-export type RecordCategory = 'ሰራተኛ' | 'ወጣት' | 'አዳጊ' | 'ህጻናት';
+export const CATEGORY_LABELS = {
+  child: 'ህጻናት',
+  youth: 'ወጣት',
+  adolescent: 'አዳጊ',
+  adult: 'ሰራተኛ',
+} as const;
+
+export type RecordCategory = keyof typeof CATEGORY_LABELS;
+
+export const RECORD_CATEGORIES: RecordCategory[] = Object.keys(CATEGORY_LABELS) as RecordCategory[];
+
+export const CATEGORY_API_VALUES: Record<RecordCategory, string> = {
+  child: 'CHILDREN',
+  youth: 'YOUTH',
+  adolescent: 'ADOLESCENT',
+  adult: 'ADULT',
+};
 
 export type SortField = 'name' | 'church' | 'age';
 
@@ -7,6 +23,11 @@ export type SortDirection = 'asc' | 'desc';
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 
 export type UserRole = 'super_admin' | 'admin' | 'manager' | 'staff';
+
+export interface LocalAuthUser {
+  username: string;
+  password: string;
+}
 
 export interface User {
   id: number;
@@ -49,41 +70,80 @@ export interface DepartmentUpdate {
   description?: string;
 }
 
+export interface ChildDetails {
+  photo_url?: string | null;
+  category: string;
+  parentName: string;
+  parentPhone: string;
+  grade?: string | null;
+  schoolName?: string | null;
+}
+
+export interface AdultDetails {
+  photo_url?: string | null;
+  category: string;
+  phone?: string | null;
+  email?: string | null;
+  maritalStatus?: string | null;
+  occupation?: string | null;
+  education?: string | null;
+}
+
+export interface YouthDetails {
+  photo_url?: string | null;
+  category: string;
+  phone?: string | null;
+  email?: string | null;
+  education?: string | null;
+  occupation?: string | null;
+}
+
+export interface AdolescentDetails {
+  photo_url?: string | null;
+  category: string;
+  parentName: string;
+  parentPhone: string;
+  grade?: string | null;
+  schoolName?: string | null;
+  phone?: string | null;
+}
+
+export type CategoryDetails = ChildDetails | AdultDetails | YouthDetails | AdolescentDetails | null;
+
+export type CategoryDetailsPayload = Record<string, Record<string, string | null>>;
+
 export interface Student {
   id: number;
   name: string;
   age: number;
   sex: string;
-  education_level: string;
-  photo_url?: string;
-  family_profile?: Record<string, unknown>;
-  phone?: string;
+  church?: string | null;
   department_id: number;
-  created_by_id: number;
-  created_at: string;
-  updated_at: string;
+  category: string;
+  category_details?: CategoryDetails;
+  created_by_id?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface StudentCreate {
   name: string;
   age: number;
   sex: string;
-  education_level: string;
-  photo_url?: string;
-  family_profile?: Record<string, unknown>;
-  phone?: string;
+  church?: string | null;
   department_id: number;
+  category: string;
+  category_details: CategoryDetailsPayload;
 }
 
 export interface StudentUpdate {
   name?: string;
   age?: number;
   sex?: string;
-  education_level?: string;
-  photo_url?: string;
-  family_profile?: Record<string, unknown>;
-  phone?: string;
+  church?: string | null;
   department_id?: number;
+  category?: string;
+  category_details?: CategoryDetails;
 }
 
 export interface PersonRecord {

@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getRecords, saveRecord, deleteRecord, updateRecord } from '@/lib/storage';
 import { sortRecords, filterRecords } from '@/lib/data-utils';
-import type { Record, RecordCategory, SortField, SortDirection } from '@/types';
+import type { PersonRecord, RecordCategory, SortField, SortDirection } from '@/types';
 
 interface UseDashboardDataReturn {
-  records: Record[];
-  filteredRecords: Record[];
+  records: PersonRecord[];
+  filteredRecords: PersonRecord[];
   selectedCategory: RecordCategory | null;
   searchTerm: string;
   sortField: SortField | null;
@@ -15,12 +15,12 @@ interface UseDashboardDataReturn {
   setSearchTerm: (term: string) => void;
   handleSort: (field: SortField) => void;
   handleDelete: (id: string) => void;
-  handleAdd: (record: Omit<Record, 'id'>) => void;
-  handleUpdate: (id: string, data: Partial<Record>) => void;
+  handleAdd: (record: Omit<PersonRecord, 'id'>) => void;
+  handleUpdate: (id: string, data: Partial<PersonRecord>) => void;
 }
 
 export function useDashboardData(): UseDashboardDataReturn {
-  const [records, setRecords] = useState<Record[]>([]);
+  const [records, setRecords] = useState<PersonRecord[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<RecordCategory | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -30,11 +30,11 @@ export function useDashboardData(): UseDashboardDataReturn {
   useEffect(() => {
     const loadedRecords = getRecords();
     if (loadedRecords.length === 0) {
-      const mockData: Record[] = [
-        { id: '1', name: 'ስም', church: 'ቅ/ግ', age: 25, category: 'ሰራተኛ' },
-        { id: '2', name: 'ስም', church: 'ቅ/ግ', age: 30, category: 'ወጣት' },
-        { id: '3', name: 'ስም', church: 'ቅ/ግ', age: 20, category: 'አዳጊ' },
-        { id: '4', name: 'ስም', church: 'ቅ/ግ', age: 15, category: 'ህጻናት' },
+      const mockData: PersonRecord[] = [
+        { id: '1', name: 'ስም', church: 'ቅ/ግ', age: 25, category: 'adult' },
+        { id: '2', name: 'ስም', church: 'ቅ/ግ', age: 30, category: 'youth' },
+        { id: '3', name: 'ስም', church: 'ቅ/ግ', age: 20, category: 'adolescent' },
+        { id: '4', name: 'ስም', church: 'ቅ/ግ', age: 15, category: 'child' },
       ];
       mockData.forEach((record) => saveRecord(record));
       setRecords(mockData);
@@ -68,16 +68,16 @@ export function useDashboardData(): UseDashboardDataReturn {
     setRecords((prev) => prev.filter((record) => record.id !== id));
   };
 
-  const handleAdd = (recordData: Omit<Record, 'id'>) => {
-    const newRecord: Record = {
+  const handleAdd = (recordData: Omit<PersonRecord, 'id'>) => {
+    const newRecord: PersonRecord = {
       ...recordData,
       id: crypto.randomUUID(),
-    };
+    } as PersonRecord;
     saveRecord(newRecord);
     setRecords((prev) => [...prev, newRecord]);
   };
 
-  const handleUpdate = (id: string, data: Partial<Record>) => {
+  const handleUpdate = (id: string, data: Partial<PersonRecord>) => {
     updateRecord(id, data);
     setRecords((prev) =>
       prev.map((record) => (record.id === id ? { ...record, ...data } : record))

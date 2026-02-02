@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { AttendanceStatus, RecordCategory } from '@/types';
 
 interface AttendanceListProps {
@@ -127,8 +128,6 @@ export function AttendanceList({ recordId, eventId }: AttendanceListProps) {
     dateRangeStart !== '' ||
     dateRangeEnd !== '' ||
     searchTerm !== '';
-
-  const categories: RecordCategory[] = ['ሰራተኛ', 'ወጣት', 'አዳጊ', 'ህጻናት'];
 
   const activeFilterCount = [
     statusFilter !== 'all',
@@ -253,9 +252,9 @@ export function AttendanceList({ recordId, eventId }: AttendanceListProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((cat) => (
+                  {RECORD_CATEGORIES.map((cat) => (
                     <SelectItem key={cat} value={cat}>
-                      {cat}
+                      {CATEGORY_LABELS[cat]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -344,7 +343,7 @@ export function AttendanceList({ recordId, eventId }: AttendanceListProps) {
             >
               All
             </button>
-            {categories.map((cat) => (
+            {RECORD_CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
@@ -354,7 +353,7 @@ export function AttendanceList({ recordId, eventId }: AttendanceListProps) {
                     : 'bg-bg-beige-light text-text-primary hover:bg-bg-beige-light/80'
                 }`}
               >
-                {cat}
+                {CATEGORY_LABELS[cat]}
               </button>
             ))}
           </div>
@@ -426,11 +425,11 @@ export function AttendanceList({ recordId, eventId }: AttendanceListProps) {
                           {record?.name || 'Unknown'}
                         </button>
                         <div className="text-xs text-text-secondary sm:hidden mt-0.5">
-                          {record?.category} • {attendance.event?.name}
+                          {record ? CATEGORY_LABELS[record.category] : '-'} • {attendance.event?.name}
                         </div>
                       </td>
                       <td className="px-3 py-2.5 text-sm text-text-primary whitespace-nowrap hidden sm:table-cell">
-                        {record?.category || '-'}
+                        {record ? CATEGORY_LABELS[record.category] : '-'}
                       </td>
                       <td className="px-3 py-2.5 text-sm text-text-primary whitespace-nowrap hidden md:table-cell">
                         {attendance.event?.name || 'Unknown Event'}

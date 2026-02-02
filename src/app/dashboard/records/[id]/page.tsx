@@ -2,28 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getCurrentUser, logout } from '@/lib/auth';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearAuth } from '@/store/slices/authSlice';
+import type { RootState } from '@/store/store';
 import { getRecords, deleteRecord } from '@/lib/storage';
 import { RecordDetails } from '@/components/dashboard/record-details';
 import { AttendanceHistory } from '@/components/dashboard/attendance-history';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import type { Record } from '@/types';
+import type { PersonRecord } from '@/types';
 
 export default function RecordDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const recordId = params.id as string;
-  const [record, setRecord] = useState<Record | null>(null);
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const [record, setRecord] = useState<PersonRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<{ username: string } | null>(null);
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
+    if (!isAuthenticated) {
       router.push('/login');
       return;
     }
-    setUser(currentUser);
 
     const records = getRecords();
     const foundRecord = records.find((r) => r.id === recordId);
@@ -33,7 +34,7 @@ export default function RecordDetailsPage() {
     }
     setRecord(foundRecord);
     setIsLoading(false);
-  }, [recordId, router]);
+  }, [recordId, router, isAuthenticated]);
 
   function handleBack() {
     router.push('/dashboard');
@@ -59,7 +60,7 @@ export default function RecordDetailsPage() {
   }
 
   function handleLogout() {
-    logout();
+    dispatch(clearAuth());
     router.push('/login');
   }
 
@@ -79,7 +80,7 @@ export default function RecordDetailsPage() {
     console.log('Notifications clicked');
   }
 
-  if (isLoading || !user) {
+  if (isLoading || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg-beige">
         <div className="text-text-primary">Loading...</div>

@@ -1,9 +1,9 @@
 import { Tooltip } from '@/components/ui/tooltip';
-import type { Record } from '@/types';
+import type { PersonRecord } from '@/types';
 
 interface TableRowProps {
-  record: Record;
-  onView?: (record: Record) => void;
+  record: PersonRecord;
+  onView?: (record: PersonRecord) => void;
   index?: number;
 }
 

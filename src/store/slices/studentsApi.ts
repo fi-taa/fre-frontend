@@ -7,7 +7,7 @@ export const studentsApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Student'],
   endpoints: (builder) => ({
-    createStudent: builder.mutation<{ data: Student }, StudentCreate>({
+    createStudent: builder.mutation<Student, StudentCreate>({
       query: (body) => ({
         url: '/students/',
         method: 'POST',
@@ -16,17 +16,17 @@ export const studentsApi = createApi({
       invalidatesTags: ['Student'],
     }),
 
-    listStudents: builder.query<{ data: Student[] }, void>({
+    listStudents: builder.query<Student[], void>({
       query: () => '/students/',
       providesTags: ['Student'],
     }),
 
-    getStudent: builder.query<{ data: Student }, number>({
+    getStudent: builder.query<Student, number>({
       query: (studentId) => `/students/${studentId}`,
       providesTags: ['Student'],
     }),
 
-    updateStudent: builder.mutation<{ data: Student }, { studentId: number; body: StudentUpdate }>({
+    updateStudent: builder.mutation<Student, { studentId: number; body: StudentUpdate }>({
       query: ({ studentId, body }) => ({
         url: `/students/${studentId}`,
         method: 'PUT',

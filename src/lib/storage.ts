@@ -1,4 +1,4 @@
-import type { User, Record, RecordCategory, Event, Attendance } from '@/types';
+import type { User, LocalAuthUser, PersonRecord, RecordCategory, Event, Attendance } from '@/types';
 import { getDefaultEvents } from './event-config';
 
 const USERS_STORAGE_KEY = 'users';
@@ -6,7 +6,7 @@ const RECORDS_STORAGE_KEY = 'records';
 const EVENTS_STORAGE_KEY = 'events';
 const ATTENDANCE_STORAGE_KEY = 'attendance';
 
-export function getUsers(): User[] {
+export function getUsers(): LocalAuthUser[] {
   if (typeof window === 'undefined') {
     return [];
   }
@@ -23,7 +23,7 @@ export function getUsers(): User[] {
   }
 }
 
-export function saveUser(user: User): void {
+export function saveUser(user: LocalAuthUser): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -33,12 +33,12 @@ export function saveUser(user: User): void {
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
 }
 
-export function findUserByUsername(username: string): User | undefined {
+export function findUserByUsername(username: string): LocalAuthUser | undefined {
   const users = getUsers();
   return users.find((user) => user.username === username);
 }
 
-export function getRecords(category?: RecordCategory): Record[] {
+export function getRecords(category?: RecordCategory): PersonRecord[] {
   if (typeof window === 'undefined') {
     return [];
   }
@@ -49,7 +49,7 @@ export function getRecords(category?: RecordCategory): Record[] {
   }
   
   try {
-    const records: Record[] = JSON.parse(stored);
+    const records: PersonRecord[] = JSON.parse(stored);
     if (category) {
       return records.filter((record) => record.category === category);
     }
@@ -59,7 +59,7 @@ export function getRecords(category?: RecordCategory): Record[] {
   }
 }
 
-export function saveRecord(record: Record): void {
+export function saveRecord(record: PersonRecord): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -79,7 +79,7 @@ export function deleteRecord(id: string): void {
   localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(filtered));
 }
 
-export function updateRecord(id: string, data: Partial<Record>): void {
+export function updateRecord(id: string, data: Partial<PersonRecord>): void {
   if (typeof window === 'undefined') {
     return;
   }

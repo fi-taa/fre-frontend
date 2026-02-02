@@ -1,15 +1,15 @@
 import { useState, useMemo, useEffect } from 'react';
-import type { Record } from '@/types';
+import type { PersonRecord } from '@/types';
 
 interface UsePaginationProps {
-  data: Record[];
+  data: PersonRecord[];
   itemsPerPage?: number;
 }
 
 interface UsePaginationReturn {
   currentPage: number;
   totalPages: number;
-  paginatedData: Record[];
+  paginatedData: PersonRecord[];
   goToPage: (page: number) => void;
   nextPage: () => void;
   previousPage: () => void;

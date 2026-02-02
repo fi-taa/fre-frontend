@@ -1,11 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/store';
 import { AddRecordForm } from '@/components/dashboard/add-record-form';
 
 export default function AddRecordPage() {
   const router = useRouter();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
 
   function handleCancel() {
     router.back();
@@ -13,6 +22,14 @@ export default function AddRecordPage() {
 
   function handleSuccess() {
     router.push('/dashboard');
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-bg-beige">
+        <div className="text-text-primary">Loading...</div>
+      </div>
+    );
   }
 
   return (

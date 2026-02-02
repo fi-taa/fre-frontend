@@ -9,6 +9,10 @@ export const departmentsApi = createApi({
   endpoints: (builder) => ({
     listDepartments: builder.query<Department[], void>({
       query: () => '/departments/',
+      transformResponse: (response: Department[] | { data?: Department[]; items?: Department[]; results?: Department[] }) => {
+        if (Array.isArray(response)) return response;
+        return response.data ?? response.items ?? response.results ?? [];
+      },
       providesTags: ['Department'],
     }),
 

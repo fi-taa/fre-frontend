@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
 
 interface AddRecordModalProps {
@@ -9,13 +10,11 @@ interface AddRecordModalProps {
   onAdd: (data: { name: string; church: string; age: number; category: RecordCategory }) => void;
 }
 
-const categories: RecordCategory[] = ['ሰራተኛ', 'ወጣት', 'አዳጊ', 'ህጻናት'];
-
 export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) {
   const [name, setName] = useState('');
   const [church, setChurch] = useState('');
   const [age, setAge] = useState('');
-  const [category, setCategory] = useState<RecordCategory>('ሰራተኛ');
+  const [category, setCategory] = useState<RecordCategory>('adult');
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
@@ -50,7 +49,7 @@ export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) 
     setName('');
     setChurch('');
     setAge('');
-    setCategory('ሰራተኛ');
+    setCategory('adult');
     onClose();
   }
 
@@ -169,9 +168,9 @@ export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) 
                 className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
                 required
               >
-                {categories.map((cat) => (
+                {RECORD_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat}
+                    {CATEGORY_LABELS[cat]}
                   </option>
                 ))}
               </select>

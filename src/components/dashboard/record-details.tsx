@@ -1,10 +1,11 @@
 'use client';
 
 import { getFormConfigByCategory } from '@/lib/form-config';
-import type { Record } from '@/types';
+import { CATEGORY_LABELS } from '@/types';
+import type { PersonRecord } from '@/types';
 
 interface RecordDetailsProps {
-  record: Record;
+  record: PersonRecord;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -26,7 +27,7 @@ export function RecordDetails({ record, onEdit, onDelete }: RecordDetailsProps) 
           <div className="min-w-0">
             <h2 className="text-base sm:text-lg font-bold text-text-primary truncate">{record.name}</h2>
             <p className="text-xs text-text-secondary mt-0.5">
-              {record.church} • {record.category} • Age {record.age}
+              {record.church} • {CATEGORY_LABELS[record.category]} • Age {record.age}
             </p>
           </div>
           <div className="flex gap-1.5 flex-shrink-0">
@@ -53,7 +54,7 @@ export function RecordDetails({ record, onEdit, onDelete }: RecordDetailsProps) 
       <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
         {formConfig.sections.map((section, sectionIndex) => {
           const hasData = section.fields.some(
-            (field) => record[field.id as keyof Record] !== undefined && record[field.id as keyof Record] !== ''
+            (field) => record[field.id as keyof PersonRecord] !== undefined && record[field.id as keyof PersonRecord] !== ''
           );
 
           if (!hasData) {
@@ -70,7 +71,7 @@ export function RecordDetails({ record, onEdit, onDelete }: RecordDetailsProps) 
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 {section.fields.map((field) => {
-                  const value = record[field.id as keyof Record];
+                  const value = record[field.id as keyof PersonRecord];
                   if (value === undefined || value === null || value === '') {
                     return null;
                   }

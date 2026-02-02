@@ -7,7 +7,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Staff Meeting',
-      category: 'ሰራተኛ',
+      category: 'adult',
       description: 'Regular staff meeting',
       isDefault: true,
       createdAt: now,
@@ -15,7 +15,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Training Session',
-      category: 'ሰራተኛ',
+      category: 'adult',
       description: 'Staff training session',
       isDefault: true,
       createdAt: now,
@@ -23,7 +23,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Weekly Service',
-      category: 'ሰራተኛ',
+      category: 'adult',
       description: 'Weekly church service',
       isDefault: true,
       createdAt: now,
@@ -31,7 +31,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Special Event',
-      category: 'ሰራተኛ',
+      category: 'adult',
       description: 'Special church event',
       isDefault: true,
       createdAt: now,
@@ -39,7 +39,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Youth Meeting',
-      category: 'ወጣት',
+      category: 'youth',
       description: 'Regular youth group meeting',
       isDefault: true,
       createdAt: now,
@@ -47,7 +47,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Bible Study',
-      category: 'ወጣት',
+      category: 'youth',
       description: 'Youth bible study session',
       isDefault: true,
       createdAt: now,
@@ -55,7 +55,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Fellowship',
-      category: 'ወጣት',
+      category: 'youth',
       description: 'Youth fellowship gathering',
       isDefault: true,
       createdAt: now,
@@ -63,7 +63,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Outreach',
-      category: 'ወጣት',
+      category: 'youth',
       description: 'Youth outreach activity',
       isDefault: true,
       createdAt: now,
@@ -71,7 +71,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Sports Activity',
-      category: 'ወጣት',
+      category: 'youth',
       description: 'Youth sports event',
       isDefault: true,
       createdAt: now,
@@ -79,7 +79,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Adult Bible Study',
-      category: 'አዳጊ',
+      category: 'adolescent',
       description: 'Adult bible study session',
       isDefault: true,
       createdAt: now,
@@ -87,7 +87,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Prayer Meeting',
-      category: 'አዳጊ',
+      category: 'adolescent',
       description: 'Adult prayer meeting',
       isDefault: true,
       createdAt: now,
@@ -95,7 +95,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Fellowship',
-      category: 'አዳጊ',
+      category: 'adolescent',
       description: 'Adult fellowship gathering',
       isDefault: true,
       createdAt: now,
@@ -103,7 +103,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Workshop',
-      category: 'አዳጊ',
+      category: 'adolescent',
       description: 'Adult workshop session',
       isDefault: true,
       createdAt: now,
@@ -111,7 +111,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Sunday School',
-      category: 'ህጻናት',
+      category: 'child',
       description: 'Children Sunday school',
       isDefault: true,
       createdAt: now,
@@ -119,7 +119,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: "Children's Service",
-      category: 'ህጻናት',
+      category: 'child',
       description: 'Children church service',
       isDefault: true,
       createdAt: now,
@@ -127,7 +127,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Activity Day',
-      category: 'ህጻናት',
+      category: 'child',
       description: 'Children activity day',
       isDefault: true,
       createdAt: now,
@@ -135,7 +135,7 @@ export function getDefaultEvents(): Event[] {
     {
       id: crypto.randomUUID(),
       name: 'Special Program',
-      category: 'ህጻናት',
+      category: 'child',
       description: 'Special children program',
       isDefault: true,
       createdAt: now,
