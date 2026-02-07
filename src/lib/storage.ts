@@ -1,8 +1,6 @@
-import type { User, LocalAuthUser, RecordCategory, Event, Attendance } from '@/types';
-import { getDefaultEvents } from './event-config';
+import type { User, LocalAuthUser, Attendance } from '@/types';
 
 const USERS_STORAGE_KEY = 'users';
-const EVENTS_STORAGE_KEY = 'events';
 const ATTENDANCE_STORAGE_KEY = 'attendance';
 
 export function getUsers(): LocalAuthUser[] {
@@ -35,65 +33,6 @@ export function saveUser(user: LocalAuthUser): void {
 export function findUserByUsername(username: string): LocalAuthUser | undefined {
   const users = getUsers();
   return users.find((user) => user.username === username);
-}
-
-export function getEvents(category?: RecordCategory): Event[] {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-  
-  const stored = localStorage.getItem(EVENTS_STORAGE_KEY);
-  if (!stored) {
-    const defaultEvents = getDefaultEvents();
-    localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(defaultEvents));
-    if (category) {
-      return defaultEvents.filter((event) => event.category === category);
-    }
-    return defaultEvents;
-  }
-  
-  try {
-    const events: Event[] = JSON.parse(stored);
-    if (category) {
-      return events.filter((event) => event.category === category);
-    }
-    return events;
-  } catch {
-    return [];
-  }
-}
-
-export function saveEvent(event: Event): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  const events = getEvents();
-  events.push(event);
-  localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(events));
-}
-
-export function deleteEvent(id: string): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  const events = getEvents();
-  const filtered = events.filter((event) => event.id !== id);
-  localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(filtered));
-}
-
-export function updateEvent(id: string, data: Partial<Event>): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  const events = getEvents();
-  const index = events.findIndex((event) => event.id === id);
-  if (index !== -1) {
-    events[index] = { ...events[index], ...data };
-    localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(events));
-  }
 }
 
 export function getAttendances(recordId?: string, eventId?: string): Attendance[] {

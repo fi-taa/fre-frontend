@@ -8,9 +8,8 @@ import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { AttendanceForm } from '@/components/dashboard/attendance-form';
 import { AttendanceList } from '@/components/dashboard/attendance-list';
-import { EventManagement } from '@/components/dashboard/event-management';
 
-type Tab = 'take' | 'view' | 'events';
+type Tab = 'take' | 'view';
 
 export function AttendanceContent() {
   const router = useRouter();
@@ -139,23 +138,12 @@ export function AttendanceContent() {
               >
                 View Records
               </button>
-              <button
-                onClick={() => setActiveTab('events')}
-                className={`px-3 py-2 text-xs font-medium transition-colors duration-200 ${
-                  activeTab === 'events'
-                    ? 'bg-accent text-text-light border-b-2 border-accent'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-beige-light'
-                }`}
-              >
-                Manage Events
-              </button>
             </div>
             <div className="p-4">
               {activeTab === 'take' && (
                 <AttendanceForm onSuccess={handleSuccess} initialRecordId={recordIdParam || undefined} />
               )}
               {activeTab === 'view' && <AttendanceList recordId={recordIdParam || undefined} />}
-              {activeTab === 'events' && <EventManagement />}
             </div>
           </div>
         </div>

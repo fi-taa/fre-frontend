@@ -237,3 +237,54 @@ export interface Attendance {
   notes?: string;
   createdAt: string;
 }
+
+export type AttendanceSessionType = 'REGULAR' | 'EVENT';
+
+export interface AttendanceRecordResponse {
+  id: number;
+  student_id: number;
+  present: boolean;
+  notes?: string | null;
+}
+
+export interface AttendanceRecordCreate {
+  student_id: number;
+  present: boolean;
+  notes?: string | null;
+}
+
+export interface AttendanceSession {
+  id: number;
+  date: string;
+  department_id: number;
+  category: string;
+  type: AttendanceSessionType;
+  records: AttendanceRecordResponse[];
+}
+
+export interface AttendanceSessionCreate {
+  date: string;
+  department_id?: number;
+  category?: string;
+  type?: AttendanceSessionType;
+  records?: AttendanceRecordCreate[] | null;
+}
+
+export interface AttendanceSessionListParams {
+  department_id?: number | null;
+  category?: string | null;
+  type?: AttendanceSessionType | null;
+}
+
+export interface EligibleStudentsParams {
+  department_id: number;
+  category: string;
+}
+
+export interface AttendanceBatchCreate {
+  date: string;
+  department_id: number;
+  category: string;
+  type: AttendanceSessionType;
+  records: AttendanceRecordCreate[];
+}
