@@ -71,6 +71,10 @@ export default function DashboardPage() {
     router.push('/dashboard/attendance');
   }
 
+  function handleDepartments() {
+    router.push('/dashboard/departments');
+  }
+
   function handleNotifications() {
     // TODO: Implement notifications functionality
   }
@@ -111,6 +115,7 @@ export default function DashboardPage() {
           onLogout={handleLogout}
           onAddRecord={handleAddRecord}
           onAttendance={handleAttendance}
+          onDepartments={handleDepartments}
           onNotifications={handleNotifications}
           notificationCount={0}
         />

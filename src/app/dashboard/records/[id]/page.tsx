@@ -75,6 +75,10 @@ export default function RecordDetailsPage() {
     router.push('/dashboard/attendance');
   }
 
+  function handleDepartments() {
+    router.push('/dashboard/departments');
+  }
+
   function handleTakeAttendance() {
     router.push(`/dashboard/attendance?recordId=${recordIdParam}`);
   }
@@ -113,6 +117,7 @@ export default function RecordDetailsPage() {
           onLogout={handleLogout}
           onAddRecord={handleAddRecord}
           onAttendance={handleAttendance}
+          onDepartments={handleDepartments}
           onNotifications={handleNotifications}
           notificationCount={0}
         />

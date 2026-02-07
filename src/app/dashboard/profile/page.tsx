@@ -43,6 +43,10 @@ export default function ProfilePage() {
     router.push('/dashboard/attendance');
   }
 
+  function handleDepartments() {
+    router.push('/dashboard/departments');
+  }
+
   function handleNotifications() {
     console.log('Notifications clicked');
   }
@@ -71,6 +75,7 @@ export default function ProfilePage() {
           onLogout={handleLogout}
           onAddRecord={handleAddRecord}
           onAttendance={handleAttendance}
+          onDepartments={handleDepartments}
           onNotifications={handleNotifications}
           notificationCount={0}
         />

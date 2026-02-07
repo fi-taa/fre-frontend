@@ -56,6 +56,10 @@ export function AttendanceContent() {
     router.push('/dashboard/attendance');
   }
 
+  function handleDepartments() {
+    router.push('/dashboard/departments');
+  }
+
   function handleNotifications() {
     console.log('Notifications clicked');
   }
@@ -84,6 +88,7 @@ export function AttendanceContent() {
           onLogout={handleLogout}
           onAddRecord={handleAddRecord}
           onAttendance={handleAttendance}
+          onDepartments={handleDepartments}
           onNotifications={handleNotifications}
           notificationCount={0}
         />
