@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useListAttendanceSessionsQuery, useGetAttendanceSessionQuery } from '@/store/slices/attendanceApi';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
 import { useListStudentsQuery } from '@/store/slices/studentsApi';
@@ -18,7 +18,6 @@ interface AttendanceListProps {
 const SESSION_TYPES: AttendanceSessionType[] = ['REGULAR', 'EVENT'];
 
 export function AttendanceList(_props: AttendanceListProps) {
-  const router = useRouter();
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<RecordCategory | 'all'>('all');
   const [typeFilter, setTypeFilter] = useState<AttendanceSessionType | 'all'>('all');
@@ -89,17 +88,7 @@ export function AttendanceList(_props: AttendanceListProps) {
     setDateRangeEnd('');
   }
 
-  function handleRecordClick(recordId: string) {
-    router.push(`/dashboard/records/${recordId}`);
-  }
-
-  if (sessionsLoading) {
-    return (
-      <div className="bg-card rounded-lg border border-border/30 p-6">
-        <div className="text-text-secondary">Loading sessions...</div>
-      </div>
-    );
-  }
+  const hasSessions = sessions.length > 0 || !sessionsLoading;
 
   return (
     <div className="space-y-4">
@@ -238,41 +227,45 @@ export function AttendanceList(_props: AttendanceListProps) {
       )}
 
       <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
-        <div className="px-4 py-2 border-b border-border/30 bg-table-header text-xs text-text-secondary">
-          {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''}
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-table-header border-b border-border/50">
-              <tr>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                  Date
-                </th>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                  Department
-                </th>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                  Category
-                </th>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                  Type
-                </th>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                  Records
-                </th>
-                <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary w-20">
-                  —
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSessions.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-text-secondary text-sm">
-                    No sessions found
-                  </td>
-                </tr>
-              ) : (
+        {!hasSessions ? (
+          <div className="p-8 text-center text-text-secondary text-sm">Loading sessions...</div>
+        ) : (
+          <>
+            <div className="px-4 py-2 border-b border-border/30 bg-table-header text-xs text-text-secondary">
+              {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-table-header border-b border-border/50">
+                  <tr>
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
+                      Date
+                    </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
+                      Department
+                    </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
+                      Category
+                    </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
+                      Type
+                    </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
+                      Records
+                    </th>
+                    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary w-20">
+                      —
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSessions.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-text-secondary text-sm">
+                        No sessions found
+                      </td>
+                    </tr>
+                  ) : (
                 filteredSessions.map((session: AttendanceSession) => (
                   <SessionRow
                     key={session.id}
@@ -280,13 +273,14 @@ export function AttendanceList(_props: AttendanceListProps) {
                     departmentName={departmentMap.get(session.department_id) ?? `#${session.department_id}`}
                     isExpanded={expandedSessionId === session.id}
                     onToggle={() => setExpandedSessionId((id) => (id === session.id ? null : session.id))}
-                    onRecordClick={handleRecordClick}
                   />
                 ))
               )}
-            </tbody>
-          </table>
-        </div>
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -297,10 +291,9 @@ interface SessionRowProps {
   departmentName: string;
   isExpanded: boolean;
   onToggle: () => void;
-  onRecordClick: (recordId: string) => void;
 }
 
-function SessionRow({ session, departmentName, isExpanded, onToggle, onRecordClick }: SessionRowProps) {
+function SessionRow({ session, departmentName, isExpanded, onToggle }: SessionRowProps) {
   const categorySlug = apiCategoryToSlug(session.category);
   const presentCount = session.records.filter((r) => r.present).length;
 
@@ -326,7 +319,7 @@ function SessionRow({ session, departmentName, isExpanded, onToggle, onRecordCli
       {isExpanded && (
         <tr>
           <td colSpan={6} className="p-0 bg-bg-beige-light/50">
-            <SessionDetail sessionId={session.id} onRecordClick={onRecordClick} />
+            <SessionDetail sessionId={session.id} />
           </td>
         </tr>
       )}
@@ -336,10 +329,9 @@ function SessionRow({ session, departmentName, isExpanded, onToggle, onRecordCli
 
 interface SessionDetailProps {
   sessionId: number;
-  onRecordClick: (recordId: string) => void;
 }
 
-function SessionDetail({ sessionId, onRecordClick }: SessionDetailProps) {
+function SessionDetail({ sessionId }: SessionDetailProps) {
   const { data: session, isLoading } = useGetAttendanceSessionQuery(sessionId);
   const { data: students = [] } = useListStudentsQuery();
   const studentMap = useMemo(() => new Map(students.map((s) => [s.id, s])), [students]);
@@ -361,16 +353,13 @@ function SessionDetail({ sessionId, onRecordClick }: SessionDetailProps) {
             const student = studentMap.get(rec.student_id);
             return (
               <li key={rec.id} className="flex items-center justify-between gap-2 text-sm">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onRecordClick(String(rec.student_id));
-                  }}
-                  className="text-link hover:text-link/80 font-medium text-left truncate flex-1 min-w-0"
+                <Link
+                  href={`/dashboard/records/${rec.student_id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-link hover:text-link/80 font-medium truncate flex-1 min-w-0 block"
                 >
                   {student?.name ?? `Student #${rec.student_id}`}
-                </button>
+                </Link>
                 <span
                   className={`shrink-0 px-2 py-0.5 text-xs font-medium rounded-full ${
                     rec.present ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'

@@ -6,6 +6,7 @@ export const departmentsApi = createApi({
   reducerPath: 'departmentsApi',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Department'],
+  keepUnusedDataFor: 300,
   endpoints: (builder) => ({
     listDepartments: builder.query<Department[], void>({
       query: () => '/departments/',

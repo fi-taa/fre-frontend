@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useGetStudentQuery } from '@/store/slices/studentsApi';
 import { useListAttendanceSessionsQuery } from '@/store/slices/attendanceApi';
 import { studentToRecordView } from '@/lib/data-utils';
@@ -18,11 +18,10 @@ interface SessionRecordView {
 
 interface AttendanceHistoryProps {
   recordId: string;
-  onTakeAttendance?: () => void;
+  attendanceHref?: string;
 }
 
-export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHistoryProps) {
-  const router = useRouter();
+export function AttendanceHistory({ recordId, attendanceHref }: AttendanceHistoryProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent'>('all');
   const [dateFilter, setDateFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -73,10 +72,6 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
   const hasActiveFilters = statusFilter !== 'all' || dateFilter !== '';
   const activeFilterCount = [statusFilter !== 'all', dateFilter !== ''].filter(Boolean).length;
 
-  function handleViewAllAttendance() {
-    router.push(`/dashboard/attendance?recordId=${recordId}`);
-  }
-
   return (
     <div className="space-y-3 sm:space-y-4">
       <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
@@ -89,20 +84,22 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
               </p>
             </div>
             <div className="flex gap-1.5 shrink-0">
-              {onTakeAttendance && (
-                <button
-                  onClick={onTakeAttendance}
-                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 whitespace-nowrap"
+              {attendanceHref && (
+                <Link
+                  href={attendanceHref}
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 whitespace-nowrap inline-block"
                 >
                   Take
-                </button>
+                </Link>
               )}
-              <button
-                onClick={handleViewAllAttendance}
-                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap"
-              >
-                View all
-              </button>
+              {attendanceHref && (
+                <Link
+                  href={attendanceHref}
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap inline-block"
+                >
+                  View all
+                </Link>
+              )}
             </div>
           </div>
         </div>

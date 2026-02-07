@@ -15,6 +15,7 @@ export const attendanceApi = createApi({
   reducerPath: 'attendanceApi',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['AttendanceSession', 'EligibleStudents'],
+  keepUnusedDataFor: 300,
   endpoints: (builder) => ({
     createAttendanceSession: builder.mutation<
       AttendanceSession,

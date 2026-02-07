@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import Link from 'next/link';
 import { Tooltip } from '@/components/ui/tooltip';
 import type { PersonRecord } from '@/types';
 
@@ -7,7 +9,7 @@ interface TableRowProps {
   index?: number;
 }
 
-export function TableRow({ record, onView, index }: TableRowProps) {
+function TableRowComponent({ record, index }: TableRowProps) {
   const isEven = index !== undefined && index % 2 === 0;
   return (
     <tr className={`border-b border-border/30 transition-colors duration-200 group ${isEven ? 'bg-table-row-alt' : 'bg-card'} hover:bg-bg-beige-light`}>
@@ -23,9 +25,9 @@ export function TableRow({ record, onView, index }: TableRowProps) {
       </td>
       <td className="px-3 py-2 text-sm text-text-primary">{record.age}</td>
       <td className="px-3 py-2">
-        <button
-          onClick={() => onView?.(record)}
-          className="p-1.5 rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30"
+        <Link
+          href={`/dashboard/records/${record.id}`}
+          className="inline-flex p-1.5 rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30"
           aria-label="View details"
         >
           <svg
@@ -43,8 +45,10 @@ export function TableRow({ record, onView, index }: TableRowProps) {
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
             <circle cx="12" cy="12" r="3" />
           </svg>
-        </button>
+        </Link>
       </td>
     </tr>
   );
 }
+
+export const TableRow = memo(TableRowComponent);

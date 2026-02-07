@@ -1,16 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import { getFormConfigByCategory } from '@/lib/form-config';
 import { CATEGORY_LABELS } from '@/types';
 import type { PersonRecord } from '@/types';
 
 interface RecordDetailsProps {
   record: PersonRecord;
-  onEdit?: () => void;
+  editHref?: string;
   onDelete?: () => void;
 }
 
-export function RecordDetails({ record, onEdit, onDelete }: RecordDetailsProps) {
+export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps) {
   const formConfig = getFormConfigByCategory(record.category);
 
   function renderFieldValue(fieldId: string, value: string | number | undefined) {
@@ -30,14 +31,14 @@ export function RecordDetails({ record, onEdit, onDelete }: RecordDetailsProps) 
               {record.church} • {CATEGORY_LABELS[record.category]} • Age {record.age}
             </p>
           </div>
-          <div className="flex gap-1.5 flex-shrink-0">
-            {onEdit && (
-              <button
-                onClick={onEdit}
-                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap"
+          <div className="flex gap-1.5 shrink-0">
+            {editHref && (
+              <Link
+                href={editHref}
+                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap inline-block"
               >
                 Edit
-              </button>
+              </Link>
             )}
             {onDelete && (
               <button
@@ -80,7 +81,7 @@ export function RecordDetails({ record, onEdit, onDelete }: RecordDetailsProps) 
                       <label className="text-xs font-medium text-text-secondary">
                         {field.label}
                       </label>
-                      <div className="text-xs text-text-primary break-words">
+                      <div className="text-xs text-text-primary wrap-break-word">
                         {field.type === 'textarea' ? (
                           <div className="whitespace-pre-wrap line-clamp-3 sm:line-clamp-none">{String(value)}</div>
                         ) : (

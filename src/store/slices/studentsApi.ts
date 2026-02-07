@@ -6,6 +6,7 @@ export const studentsApi = createApi({
   reducerPath: 'studentsApi',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Student'],
+  keepUnusedDataFor: 300,
   endpoints: (builder) => ({
     createStudent: builder.mutation<Student, StudentCreate>({
       query: (body) => ({

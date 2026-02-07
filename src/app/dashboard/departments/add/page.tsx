@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearAuth } from '@/store/slices/authSlice';
@@ -24,10 +25,6 @@ export default function AddDepartmentPage() {
     }
   }, [isAuthenticated, router]);
 
-  function handleProfile() {
-    router.push('/dashboard/profile');
-  }
-
   function handleSettings() {
     console.log('Settings clicked');
   }
@@ -35,18 +32,6 @@ export default function AddDepartmentPage() {
   function handleLogout() {
     dispatch(clearAuth());
     router.push('/login');
-  }
-
-  function handleAddRecord() {
-    router.push('/dashboard/add');
-  }
-
-  function handleAttendance() {
-    router.push('/dashboard/attendance');
-  }
-
-  function handleDepartments() {
-    router.push('/dashboard/departments');
   }
 
   function handleNotifications() {
@@ -90,39 +75,17 @@ export default function AddDepartmentPage() {
         }}
       />
       <div className="relative z-10">
-        <DashboardHeader
-          onProfile={handleProfile}
-          onSettings={handleSettings}
-          onLogout={handleLogout}
-          onAddRecord={handleAddRecord}
-          onAttendance={handleAttendance}
-          onDepartments={handleDepartments}
-          onNotifications={handleNotifications}
-          notificationCount={0}
-        />
+        <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
       </div>
       <div className="flex-1 overflow-auto relative z-10">
         <div className="max-w-lg mx-auto p-6 space-y-6">
-          <button
-            onClick={() => router.push('/dashboard/departments')}
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
+          <Link href="/dashboard/departments" className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200 w-fit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m12 19-7-7 7-7" />
               <path d="M19 12H5" />
             </svg>
             Back to Departments
-          </button>
+          </Link>
 
           <h1 className="text-xl font-bold text-text-primary">Add department</h1>
 
@@ -165,13 +128,9 @@ export default function AddDepartmentPage() {
               >
                 {isLoading ? 'Saving...' : 'Create'}
               </button>
-              <button
-                type="button"
-                onClick={() => router.push('/dashboard/departments')}
-                className="px-4 py-2 text-sm font-medium rounded-lg border border-border/40 hover:bg-bg-beige-light text-text-primary"
-              >
+              <Link href="/dashboard/departments" className="px-4 py-2 text-sm font-medium rounded-lg border border-border/40 hover:bg-bg-beige-light text-text-primary inline-block">
                 Cancel
-              </button>
+              </Link>
             </div>
           </form>
         </div>
