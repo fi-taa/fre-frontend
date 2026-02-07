@@ -1,8 +1,7 @@
-import type { User, LocalAuthUser, PersonRecord, RecordCategory, Event, Attendance } from '@/types';
+import type { User, LocalAuthUser, RecordCategory, Event, Attendance } from '@/types';
 import { getDefaultEvents } from './event-config';
 
 const USERS_STORAGE_KEY = 'users';
-const RECORDS_STORAGE_KEY = 'records';
 const EVENTS_STORAGE_KEY = 'events';
 const ATTENDANCE_STORAGE_KEY = 'attendance';
 
@@ -36,60 +35,6 @@ export function saveUser(user: LocalAuthUser): void {
 export function findUserByUsername(username: string): LocalAuthUser | undefined {
   const users = getUsers();
   return users.find((user) => user.username === username);
-}
-
-export function getRecords(category?: RecordCategory): PersonRecord[] {
-  if (typeof window === 'undefined') {
-    return [];
-  }
-  
-  const stored = localStorage.getItem(RECORDS_STORAGE_KEY);
-  if (!stored) {
-    return [];
-  }
-  
-  try {
-    const records: PersonRecord[] = JSON.parse(stored);
-    if (category) {
-      return records.filter((record) => record.category === category);
-    }
-    return records;
-  } catch {
-    return [];
-  }
-}
-
-export function saveRecord(record: PersonRecord): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  const records = getRecords();
-  records.push(record);
-  localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(records));
-}
-
-export function deleteRecord(id: string): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  const records = getRecords();
-  const filtered = records.filter((record) => record.id !== id);
-  localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(filtered));
-}
-
-export function updateRecord(id: string, data: Partial<PersonRecord>): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-  
-  const records = getRecords();
-  const index = records.findIndex((record) => record.id === id);
-  if (index !== -1) {
-    records[index] = { ...records[index], ...data };
-    localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(records));
-  }
 }
 
 export function getEvents(category?: RecordCategory): Event[] {

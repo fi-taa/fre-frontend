@@ -3,7 +3,9 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAttendance } from '@/hooks/use-attendance';
-import { getEvents, getRecords } from '@/lib/storage';
+import { useGetStudentQuery } from '@/store/slices/studentsApi';
+import { studentToRecordView } from '@/lib/data-utils';
+import { getEvents } from '@/lib/storage';
 import {
   Select,
   SelectContent,
@@ -26,8 +28,9 @@ export function AttendanceHistory({ recordId, onTakeAttendance }: AttendanceHist
   const [showFilters, setShowFilters] = useState(false);
   const { attendances, isLoading } = useAttendance(recordId);
   const allEvents = getEvents();
-  const records = getRecords();
-  const record = records.find((r) => r.id === recordId);
+  const recordIdNum = parseInt(recordId, 10);
+  const { data: student } = useGetStudentQuery(recordIdNum, { skip: isNaN(recordIdNum) });
+  const record = student ? studentToRecordView(student) : undefined;
 
   const hasActiveFilters = statusFilter !== 'all' || eventFilter !== 'all' || dateFilter !== '';
   const activeFilterCount = [

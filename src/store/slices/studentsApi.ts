@@ -18,6 +18,8 @@ export const studentsApi = createApi({
 
     listStudents: builder.query<Student[], void>({
       query: () => '/students/',
+      transformResponse: (response: Student[] | { data?: Student[]; items?: Student[]; results?: Student[] }) =>
+        Array.isArray(response) ? response : (response.data ?? response.items ?? response.results ?? []),
       providesTags: ['Student'],
     }),
 

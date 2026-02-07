@@ -16,6 +16,17 @@ export const CATEGORY_API_VALUES: Record<RecordCategory, string> = {
   adult: 'ADULT',
 };
 
+const API_CATEGORY_MAP: Record<string, RecordCategory> = {
+  CHILDREN: 'child',
+  YOUTH: 'youth',
+  ADOLESCENT: 'adolescent',
+  ADULT: 'adult',
+};
+
+export function apiCategoryToSlug(apiCategory: string): RecordCategory {
+  return API_CATEGORY_MAP[apiCategory] ?? 'adult';
+}
+
 export type SortField = 'name' | 'church' | 'age';
 
 export type SortDirection = 'asc' | 'desc';

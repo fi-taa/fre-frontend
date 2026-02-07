@@ -6,13 +6,11 @@ import {
   updateAttendance,
   getAttendancesByDate,
   getEvents,
-  getRecords,
 } from '@/lib/storage';
-import type { Attendance, Event, PersonRecord } from '@/types';
+import type { Attendance, Event } from '@/types';
 
 interface AttendanceWithEvent extends Attendance {
   event?: Event;
-  record?: PersonRecord;
 }
 
 interface UseAttendanceReturn {
@@ -33,16 +31,12 @@ export function useAttendance(
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
-  const [records, setRecords] = useState<PersonRecord[]>([]);
 
   useEffect(() => {
     const loadedAttendances = getAttendances(recordId, eventId);
     const loadedEvents = getEvents();
-    const loadedRecords = getRecords();
-    
     setAttendances(loadedAttendances);
     setEvents(loadedEvents);
-    setRecords(loadedRecords);
     setIsLoading(false);
   }, [recordId, eventId]);
 

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { getRecords } from '@/lib/storage';
+import { useListStudentsQuery } from '@/store/slices/studentsApi';
+import { studentToRecordView } from '@/lib/data-utils';
 import { useEvents } from '@/hooks/use-events';
 import { useAttendance } from '@/hooks/use-attendance';
 import {
@@ -121,7 +122,8 @@ function AttendanceNoteModal({ isOpen, onClose, onSave, count }: AttendanceNoteM
 }
 
 export function AttendanceForm({ onSuccess, onCancel, initialRecordId }: AttendanceFormProps) {
-  const records = getRecords();
+  const { data: students = [] } = useListStudentsQuery();
+  const records = useMemo(() => students.map(studentToRecordView), [students]);
   const initialRecord = initialRecordId ? records.find((r) => r.id === initialRecordId) : null;
   
   const [searchTerm, setSearchTerm] = useState('');

@@ -3,7 +3,9 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAttendance } from '@/hooks/use-attendance';
-import { getRecords, getEvents } from '@/lib/storage';
+import { useListStudentsQuery } from '@/store/slices/studentsApi';
+import { studentToRecordView } from '@/lib/data-utils';
+import { getEvents } from '@/lib/storage';
 import {
   Select,
   SelectContent,
@@ -30,7 +32,8 @@ export function AttendanceList({ recordId, eventId }: AttendanceListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const { attendances, isLoading } = useAttendance(recordId, eventId);
-  const records = getRecords();
+  const { data: students = [] } = useListStudentsQuery();
+  const records = useMemo(() => students.map(studentToRecordView), [students]);
   const events = getEvents();
 
   const filteredAttendances = useMemo(() => {

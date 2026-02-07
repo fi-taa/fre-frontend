@@ -1,4 +1,15 @@
-import type { PersonRecord, RecordCategory, SortField, SortDirection } from '@/types';
+import type { PersonRecord, RecordCategory, SortField, SortDirection, Student } from '@/types';
+import { apiCategoryToSlug } from '@/types';
+
+export function studentToRecordView(student: Student): PersonRecord {
+  return {
+    id: String(student.id),
+    name: student.name,
+    church: student.church ?? '',
+    age: student.age,
+    category: apiCategoryToSlug(student.category),
+  };
+}
 
 export function sortRecords(
   records: PersonRecord[],

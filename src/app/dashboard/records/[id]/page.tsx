@@ -1,53 +1,56 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearAuth } from '@/store/slices/authSlice';
-import type { RootState } from '@/store/store';
-import { getRecords, deleteRecord } from '@/lib/storage';
+import { useGetStudentQuery, useDeleteStudentMutation } from '@/store/slices/studentsApi';
+import { studentToRecordView } from '@/lib/data-utils';
 import { RecordDetails } from '@/components/dashboard/record-details';
 import { AttendanceHistory } from '@/components/dashboard/attendance-history';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import type { PersonRecord } from '@/types';
+import type { RootState } from '@/store/store';
 
 export default function RecordDetailsPage() {
   const router = useRouter();
   const params = useParams();
-  const recordId = params.id as string;
+  const recordIdParam = params.id as string;
+  const recordId = parseInt(recordIdParam, 10);
+  const isValidId = Boolean(recordIdParam && !isNaN(recordId));
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const [record, setRecord] = useState<PersonRecord | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: student, isLoading, isError } = useGetStudentQuery(recordId, { skip: !isValidId });
+  const [deleteStudent] = useDeleteStudentMutation();
 
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
+  }, [isAuthenticated, router]);
 
-    const records = getRecords();
-    const foundRecord = records.find((r) => r.id === recordId);
-    if (!foundRecord) {
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (!isValidId || isError) {
       router.push('/dashboard');
-      return;
     }
-    setRecord(foundRecord);
-    setIsLoading(false);
-  }, [recordId, router, isAuthenticated]);
+  }, [isAuthenticated, isValidId, isError, router]);
 
   function handleBack() {
     router.push('/dashboard');
   }
 
   function handleEdit() {
-    router.push(`/dashboard/records/${recordId}/edit`);
+    router.push(`/dashboard/records/${recordIdParam}/edit`);
   }
 
-  function handleDelete() {
-    if (confirm('Are you sure you want to delete this record?')) {
-      deleteRecord(recordId);
+  async function handleDelete() {
+    if (!confirm('Are you sure you want to delete this record?')) return;
+    try {
+      await deleteStudent(recordId).unwrap();
       router.push('/dashboard');
+    } catch {
+      // Error handled by mutation
     }
   }
 
@@ -73,14 +76,18 @@ export default function RecordDetailsPage() {
   }
 
   function handleTakeAttendance() {
-    router.push(`/dashboard/attendance?recordId=${recordId}`);
+    router.push(`/dashboard/attendance?recordId=${recordIdParam}`);
   }
 
   function handleNotifications() {
     console.log('Notifications clicked');
   }
 
-  if (isLoading || !isAuthenticated) {
+  if (!isAuthenticated || !isValidId) {
+    return null;
+  }
+
+  if (isLoading || !student) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg-beige">
         <div className="text-text-primary">Loading...</div>
@@ -88,9 +95,7 @@ export default function RecordDetailsPage() {
     );
   }
 
-  if (!record) {
-    return null;
-  }
+  const record = studentToRecordView(student);
 
   return (
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
@@ -135,7 +140,7 @@ export default function RecordDetailsPage() {
             Back
           </button>
           <RecordDetails record={record} onEdit={handleEdit} onDelete={handleDelete} />
-          <AttendanceHistory recordId={recordId} onTakeAttendance={handleTakeAttendance} />
+          <AttendanceHistory recordId={recordIdParam} onTakeAttendance={handleTakeAttendance} />
         </div>
       </div>
     </div>
