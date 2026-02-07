@@ -58,10 +58,6 @@ export default function DashboardPage() {
     router.push('/login');
   }
 
-  function handleSettings() {
-    console.log('Settings clicked');
-  }
-
   function handleNotifications() {
     // TODO: Implement notifications functionality
   }
@@ -75,7 +71,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
         <div className="relative z-10">
-          <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+          <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
           <div className="bg-card border-b border-border/30 min-h-[120px]" />
         </div>
         <div className="flex-1 flex items-center justify-center relative z-10">
@@ -96,7 +92,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
       <div className="relative z-10">
-        <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+        <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
         <div className="bg-card border-b border-border/30">
           <TabNavigation selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} onDelete={() => {}} onFilter={handleFilter} hasSelection={false} />

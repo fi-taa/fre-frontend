@@ -107,7 +107,7 @@ export function LoginForm() {
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full min-h-[44px] px-4 rounded-lg border border-border bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
+            className="w-full min-h-[44px] px-4 text-base rounded-lg border border-border bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             placeholder="Enter your username"
             required
             disabled={isLoading}
@@ -127,7 +127,7 @@ export function LoginForm() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full min-h-[44px] px-4 pr-12 rounded-lg border border-border bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
+              className="w-full min-h-[44px] px-4 pr-12 text-base rounded-lg border border-border bg-card text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               placeholder="Enter your password"
               required
               disabled={isLoading}
@@ -135,7 +135,7 @@ export function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary focus:outline-none"
+              className="absolute right-2 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-text-secondary hover:text-text-primary focus:outline-none"
               disabled={isLoading}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >

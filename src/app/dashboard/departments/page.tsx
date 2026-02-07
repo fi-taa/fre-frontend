@@ -33,10 +33,6 @@ export default function DepartmentsPage() {
     }
   }, [mounted, isAuthenticated, router]);
 
-  function handleSettings() {
-    console.log('Settings clicked');
-  }
-
   function handleLogout() {
     dispatch(clearAuth());
     router.push('/login');
@@ -60,7 +56,7 @@ export default function DepartmentsPage() {
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
         <div className="relative z-10">
-          <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+          <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
         </div>
         <div className="flex-1 flex items-center justify-center relative z-10">
           <PageLoader />
@@ -79,13 +75,13 @@ export default function DepartmentsPage() {
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
       <div className="relative z-10">
-        <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+        <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
       </div>
       <div className="flex-1 overflow-auto relative z-10">
         <div className="max-w-4xl mx-auto p-6 space-y-6">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200 w-fit"
+            className="flex min-h-[44px] items-center gap-2 py-2 text-text-secondary hover:text-text-primary transition-colors duration-200 w-fit"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m12 19-7-7 7-7" />
@@ -96,7 +92,7 @@ export default function DepartmentsPage() {
 
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <h1 className="text-xl font-bold text-text-primary">Departments</h1>
-            <Link href="/dashboard/departments/add" className="px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30">
+            <Link href="/dashboard/departments/add" className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30">
               Add department
             </Link>
           </div>
@@ -107,7 +103,7 @@ export default function DepartmentsPage() {
             ) : departments.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-text-secondary mb-4">No departments yet.</p>
-                <Link href="/dashboard/departments/add" className="inline-block px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90">
+                <Link href="/dashboard/departments/add" className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90">
                   Add department
                 </Link>
               </div>

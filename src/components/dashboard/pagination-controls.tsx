@@ -20,7 +20,7 @@ export function PaginationControls({
       <button
         onClick={onPrevious}
         disabled={!canGoPrevious}
-        className={`p-1.5 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
+        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
           canGoPrevious
             ? 'text-text-primary hover:bg-bg-beige-light'
             : 'text-text-muted cursor-not-allowed opacity-40'
@@ -44,7 +44,7 @@ export function PaginationControls({
       <button
         onClick={onNext}
         disabled={!canGoNext}
-        className={`p-1.5 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
+        className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
           canGoNext
             ? 'text-text-primary hover:bg-bg-beige-light'
             : 'text-text-muted cursor-not-allowed opacity-40'

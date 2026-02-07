@@ -31,19 +31,20 @@ export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps
               {record.church} • {CATEGORY_LABELS[record.category]} • Age {record.age}
             </p>
           </div>
-          <div className="flex gap-1.5 shrink-0">
+          <div className="flex gap-2 shrink-0">
             {editHref && (
               <Link
                 href={editHref}
-                className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap inline-block"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap"
               >
                 Edit
               </Link>
             )}
             {onDelete && (
               <button
+                type="button"
                 onClick={onDelete}
-                className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-error/10 text-error hover:bg-error/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-error/30 whitespace-nowrap"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg bg-error/10 text-error hover:bg-error/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-error/30 whitespace-nowrap"
               >
                 Delete
               </button>

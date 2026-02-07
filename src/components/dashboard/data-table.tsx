@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { TableRow } from './table-row';
 import { PaginationControls } from './pagination-controls';
 import type { PersonRecord, SortField } from '@/types';
@@ -91,7 +92,40 @@ export function DataTable({
           backgroundSize: '50px 50px',
         }}
       />
-      <div className="overflow-x-auto relative z-10">
+      <div className="sm:hidden relative z-10 p-3 space-y-2">
+        {records.length === 0 ? (
+          <div className="py-8 text-center text-text-secondary text-sm">No records found</div>
+        ) : (
+          <>
+            {records.map((record) => (
+              <Link
+                key={record.id}
+                href={`/dashboard/records/${record.id}`}
+                className="flex min-h-[44px] items-center justify-between gap-3 rounded-lg border border-border/30 bg-bg-beige-light/50 px-4 py-3 text-left transition-colors hover:bg-bg-beige-light focus:outline-none focus:ring-2 focus:ring-link/30"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-text-primary truncate">{record.name}</div>
+                  <div className="text-sm text-text-secondary truncate">{record.church} · {record.age}</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-text-muted">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </Link>
+            ))}
+            <div className="flex justify-end pt-2">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPrevious={onPrevious}
+                onNext={onNext}
+                canGoPrevious={canGoPrevious}
+                canGoNext={canGoNext}
+              />
+            </div>
+          </>
+        )}
+      </div>
+      <div className="hidden sm:block overflow-x-auto relative z-10">
         <table className="w-full">
           <thead className="bg-table-header border-b border-border/50 sticky top-0 z-10">
             <tr>
@@ -114,23 +148,13 @@ export function DataTable({
                 </button>
               </th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => onSort('age')}
-                    className="flex items-center gap-1.5 hover:text-link transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/20 rounded px-1.5 py-0.5 -ml-1.5"
-                  >
-                    እድሜ
-                    <SortIcon field="age" />
-                  </button>
-                  <PaginationControls
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPrevious={onPrevious}
-                    onNext={onNext}
-                    canGoPrevious={canGoPrevious}
-                    canGoNext={canGoNext}
-                  />
-                </div>
+                <button
+                  onClick={() => onSort('age')}
+                  className="flex items-center gap-1.5 hover:text-link transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/20 rounded px-1.5 py-0.5 -ml-1.5"
+                >
+                  እድሜ
+                  <SortIcon field="age" />
+                </button>
               </th>
               <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary w-16">
                 {/* View column header */}
@@ -153,6 +177,16 @@ export function DataTable({
             )}
           </tbody>
         </table>
+      </div>
+      <div className="hidden sm:flex items-center justify-end border-t border-border/30 px-3 py-2 bg-table-header">
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrevious={onPrevious}
+          onNext={onNext}
+          canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
+        />
       </div>
     </div>
   );

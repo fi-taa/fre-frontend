@@ -31,10 +31,6 @@ export default function ProfilePage() {
     router.push('/login');
   }
 
-  function handleSettings() {
-    console.log('Settings clicked');
-  }
-
   function handleNotifications() {
     console.log('Notifications clicked');
   }
@@ -44,7 +40,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
         <div className="relative z-10">
-          <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+          <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
         </div>
         <div className="flex-1 flex items-center justify-center relative z-10">
           <PageLoader />
@@ -68,7 +64,6 @@ export default function ProfilePage() {
       />
       <div className="relative z-10">
         <DashboardHeader
-          onSettings={handleSettings}
           onLogout={handleLogout}
           onNotifications={handleNotifications}
           notificationCount={0}

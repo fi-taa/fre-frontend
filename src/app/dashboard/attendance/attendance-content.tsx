@@ -50,10 +50,6 @@ export function AttendanceContent() {
     setActiveTab('view');
   }
 
-  function handleSettings() {
-    console.log('Settings clicked');
-  }
-
   function handleLogout() {
     dispatch(clearAuth());
     router.push('/login');
@@ -68,7 +64,7 @@ export function AttendanceContent() {
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
         <div className="relative z-10">
-          <DashboardHeader onSettings={handleSettings} onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+          <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
         </div>
         <div className="flex-1 flex items-center justify-center relative z-10">
           <PageLoader />
@@ -92,7 +88,6 @@ export function AttendanceContent() {
       />
       <div className="relative z-10">
         <DashboardHeader
-          onSettings={handleSettings}
           onLogout={handleLogout}
           onNotifications={handleNotifications}
           notificationCount={0}
@@ -102,7 +97,7 @@ export function AttendanceContent() {
         <div className="max-w-6xl mx-auto p-6 space-y-6">
           <Link
             href={recordIdParam ? `/dashboard/records/${recordIdParam}` : '/dashboard'}
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200 w-fit"
+            className="flex min-h-[44px] items-center gap-2 py-2 text-text-secondary hover:text-text-primary transition-colors duration-200 w-fit"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m12 19-7-7 7-7" />

@@ -14,7 +14,7 @@ export default function LoginPage() {
         <div className="text-center">
           <a
             href="/signup"
-            className="text-sm text-link hover:underline"
+            className="inline-flex min-h-[44px] items-center justify-center text-sm text-link hover:underline"
           >
             Don't have an account? Sign up
           </a>
