@@ -105,7 +105,7 @@ export default function DashboardPage() {
   }
 
   function handleNotifications() {
-    // TODO: Implement notifications functionality
+    // Notifications not implemented yet
   }
 
   if (!mounted) {
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
       </div>
       <div className="flex-1 overflow-auto relative z-10">
-        <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+        <main id="main-content" className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
           {loading ? (
             <div className="flex items-center justify-center min-h-[320px]">
               <PageLoader />
@@ -326,7 +326,7 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { getGreeting } from '@/lib/data-utils';
 import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SkipToContent } from '@/components/dashboard/skip-to-content';
 
 interface DashboardHeaderProps {
   onLogout?: () => void;
@@ -26,6 +28,7 @@ export function DashboardHeader({
   notificationCount = 0,
 }: DashboardHeaderProps) {
   const [greeting, setGreeting] = useState('');
+  const pathname = usePathname();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { data: currentUserData, isLoading: isLoadingUser, error: userError } = useGetCurrentUserQuery(undefined, {
     skip: !isAuthenticated,
@@ -42,10 +45,15 @@ export function DashboardHeader({
   }, []);
 
   function NavLink({ href, children, icon }: { href: string; children: React.ReactNode; icon: React.ReactNode }) {
+    const isActive = pathname === href || (href !== '/dashboard' && pathname?.startsWith(href));
     return (
       <Link
         href={href}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg text-text-primary hover:bg-bg-beige-light transition-colors focus:outline-none focus:ring-2 focus:ring-link/30"
+        className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-link/30 ${
+          isActive
+            ? 'bg-accent/10 text-accent'
+            : 'text-text-primary hover:bg-bg-beige-light'
+        }`}
       >
         <span className="flex h-8 w-8 items-center justify-center shrink-0">{icon}</span>
         <span className="hidden lg:inline">{children}</span>
@@ -138,10 +146,12 @@ export function DashboardHeader({
   }
 
   return (
-    <header
-      className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border/20 shadow-sm"
-      style={{ paddingTop: 'env(safe-area-inset-top)' }}
-    >
+    <>
+      <SkipToContent />
+      <header
+        className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border/20 shadow-sm"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
       <div className="flex h-14 min-h-[56px] items-center justify-between gap-2 px-4">
         <div className="flex items-center gap-2">
           <DropdownMenu>
@@ -158,16 +168,24 @@ export function DashboardHeader({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 rounded-2xl shadow-lg border border-border/20">
-              {menuItems.map((item) => (
-                <DropdownMenuItem key={item.href} asChild>
-                  <Link href={item.href} className="flex items-center gap-3 py-2.5">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-beige-light">
-                      {item.icon}
-                    </span>
-                    {item.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href));
+                return (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-3 py-2.5 ${
+                        isActive ? 'bg-accent/10 text-accent' : ''
+                      }`}
+                    >
+                      <span className={`flex h-9 w-9 items-center justify-center rounded-full ${isActive ? 'bg-accent/15' : 'bg-bg-beige-light'}`}>
+                        {item.icon}
+                      </span>
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
               <DropdownMenuSeparator className="my-1" />
               <DropdownMenuItem onClick={onLogout} className="py-2.5 gap-3 text-error focus:text-error focus:bg-error/10">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-error/10">
@@ -228,5 +246,6 @@ export function DashboardHeader({
         </div>
       </div>
     </header>
+    </>
   );
 }

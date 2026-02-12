@@ -61,7 +61,7 @@ export default function AdminsPage() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   async function handleDelete(adminId: number) {

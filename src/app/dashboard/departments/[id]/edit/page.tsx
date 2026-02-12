@@ -53,7 +53,7 @@ export default function EditDepartmentPage() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

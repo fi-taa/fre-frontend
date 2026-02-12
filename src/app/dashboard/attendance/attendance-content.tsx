@@ -56,7 +56,7 @@ export function AttendanceContent() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   if (!mounted) {

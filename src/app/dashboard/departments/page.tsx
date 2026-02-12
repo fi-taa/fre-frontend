@@ -39,7 +39,7 @@ export default function DepartmentsPage() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   async function handleDelete(dept: Department) {

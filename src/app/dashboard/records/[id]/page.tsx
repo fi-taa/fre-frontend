@@ -60,7 +60,7 @@ export default function RecordDetailsPage() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   if (!mounted) {

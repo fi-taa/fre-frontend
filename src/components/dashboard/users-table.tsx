@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
 import type { User } from '@/types';
 
@@ -10,7 +11,7 @@ interface UsersTableProps {
   onDelete?: (userId: number) => void;
 }
 
-export function UsersTable({ users, userType, isLoading = false, onDelete }: UsersTableProps) {
+function UsersTableComponent({ users, userType, isLoading = false, onDelete }: UsersTableProps) {
   const { data: departments = [] } = useListDepartmentsQuery();
 
   function getDepartmentNames(departmentIds: number[]): string {
@@ -103,3 +104,5 @@ export function UsersTable({ users, userType, isLoading = false, onDelete }: Use
     </div>
   );
 }
+
+export const UsersTable = memo(UsersTableComponent);

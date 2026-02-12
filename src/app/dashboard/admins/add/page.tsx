@@ -43,7 +43,7 @@ export default function AddAdminPage() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   async function handleSubmit(data: { email: string; full_name: string; password: string; department_id: number }) {

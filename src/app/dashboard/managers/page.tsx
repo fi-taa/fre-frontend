@@ -70,7 +70,7 @@ export default function ManagersPage() {
   }
 
   function handleNotifications() {
-    console.log('Notifications clicked');
+    // Notifications not implemented yet
   }
 
   if (!mounted) {

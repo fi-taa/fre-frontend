@@ -59,11 +59,11 @@ export default function RecordsPage() {
   }
 
   function handleNotifications() {
-    // TODO: Implement notifications functionality
+    // Notifications not implemented yet
   }
 
   function handleFilter() {
-    // TODO: Implement filter functionality
+    // Filter functionality not implemented yet
   }
 
   if (!mounted) {
