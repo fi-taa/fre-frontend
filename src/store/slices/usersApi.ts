@@ -9,6 +9,12 @@ export const usersApi = createApi({
   endpoints: (builder) => ({
     getCurrentUser: builder.query<{ data: User }, void>({
       query: () => '/users/me',
+      transformResponse: (response: User | { data: User }): { data: User } => {
+        if (response && typeof response === 'object' && 'data' in response) {
+          return response as { data: User };
+        }
+        return { data: response as User };
+      },
       providesTags: ['User'],
     }),
 

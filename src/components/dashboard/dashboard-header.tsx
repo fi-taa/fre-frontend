@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
 import { getGreeting } from '@/lib/data-utils';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
+import type { RootState } from '@/store/store';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +26,14 @@ export function DashboardHeader({
   notificationCount = 0,
 }: DashboardHeaderProps) {
   const [greeting, setGreeting] = useState('');
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const { data: currentUserData, isLoading: isLoadingUser, error: userError } = useGetCurrentUserQuery(undefined, {
+    skip: !isAuthenticated,
+  });
+  const currentUser = currentUserData?.data;
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isAdmin = currentUser?.role === 'admin' || isSuperAdmin;
+
 
   useEffect(() => {
     setGreeting(getGreeting());
@@ -109,6 +120,34 @@ export function DashboardHeader({
                   Departments
                 </Link>
               </DropdownMenuItem>
+              {isSuperAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/admins" className="flex items-center gap-3 py-2.5">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-beige-light">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </span>
+                    Admins
+                  </Link>
+                </DropdownMenuItem>
+              )}
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/managers" className="flex items-center gap-3 py-2.5">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg-beige-light">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                    </span>
+                    Managers
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator className="my-1" />
               <DropdownMenuItem onClick={onLogout} className="py-2.5 gap-3 text-error focus:text-error focus:bg-error/10">
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-error/10">
