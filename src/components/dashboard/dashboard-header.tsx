@@ -45,7 +45,9 @@ export function DashboardHeader({
   }, []);
 
   function NavLink({ href, children, icon }: { href: string; children: React.ReactNode; icon: React.ReactNode }) {
-    const isActive = pathname === href || (href !== '/dashboard' && pathname?.startsWith(href));
+    const isActive = href === '/dashboard' 
+      ? pathname === '/dashboard'
+      : pathname === href || pathname?.startsWith(`${href}/`);
     return (
       <Link
         href={href}
@@ -62,6 +64,18 @@ export function DashboardHeader({
   }
 
   const menuItems = [
+    {
+      href: '/dashboard',
+      label: 'Dashboard',
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
+      ),
+    },
     {
       href: '/dashboard/profile',
       label: 'Profile',
@@ -153,7 +167,7 @@ export function DashboardHeader({
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
       <div className="flex h-14 min-h-[56px] items-center justify-between gap-2 px-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -169,7 +183,9 @@ export function DashboardHeader({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56 rounded-2xl shadow-lg border border-border/20">
               {menuItems.map((item) => {
-                const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href));
+                const isActive = item.href === '/dashboard'
+                  ? pathname === '/dashboard'
+                  : pathname === item.href || pathname?.startsWith(`${item.href}/`);
                 return (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link
@@ -200,6 +216,17 @@ export function DashboardHeader({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          <div className="hidden lg:flex flex-col items-start">
+            <h1 className="text-lg font-semibold text-text-primary tabular-nums leading-tight">
+              ፍሬ ሃይማኖት መዝገብ
+            </h1>
+            {greeting && (
+              <span className="text-xs text-text-secondary font-medium tabular-nums">
+                {greeting}
+              </span>
+            )}
+          </div>
+
           <nav className="hidden lg:flex items-center gap-1">
             {menuItems.map((item) => (
               <NavLink key={item.href} href={item.href} icon={item.icon}>
@@ -209,15 +236,17 @@ export function DashboardHeader({
           </nav>
         </div>
 
-        <div className="flex flex-1 min-w-0 items-baseline justify-center gap-1.5">
-          <h1 className="text-lg font-semibold text-text-primary truncate tabular-nums">
-            ፍሬ ሃይማኖት መዝገብ
-          </h1>
-          {greeting ? (
-            <span className="hidden sm:inline-flex shrink-0 text-xs text-text-secondary font-medium">
-              {greeting}
-            </span>
-          ) : null}
+        <div className="flex flex-1 min-w-0 items-center justify-center lg:hidden">
+          <div className="flex flex-col items-center">
+            <h1 className="text-lg font-semibold text-text-primary truncate tabular-nums leading-tight">
+              ፍሬ ሃይማኖት መዝገብ
+            </h1>
+            {greeting && (
+              <span className="text-xs text-text-secondary font-medium tabular-nums">
+                {greeting}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center justify-end gap-2">
