@@ -7,8 +7,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useListStudentsQuery } from '@/store/slices/studentsApi';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
 import { useListAttendanceSessionsQuery } from '@/store/slices/attendanceApi';
+import { useGetCurrentUserQuery, useListUsersQuery } from '@/store/slices/usersApi';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { PageLoader } from '@/components/ui/page-loader';
+import { StatisticsViewToggle } from '@/components/dashboard/statistics-view-toggle';
+import { StatisticsTableView } from '@/components/dashboard/statistics-table-view';
+import { StatisticsGraphView } from '@/components/dashboard/statistics-graph-view';
 import { clearAuth } from '@/store/slices/authSlice';
 import { apiCategoryToSlug, CATEGORY_LABELS } from '@/types';
 import type { RootState } from '@/store/store';
@@ -25,11 +29,17 @@ export default function DashboardPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
+  const [statisticsView, setStatisticsView] = useState<'table' | 'graph'>('graph');
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   const { data: students = [], isLoading: studentsLoading } = useListStudentsQuery();
   const { data: departments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
   const { data: sessions = [], isLoading: sessionsLoading } = useListAttendanceSessionsQuery();
+  const { data: currentUserData } = useGetCurrentUserQuery();
+  const { data: usersData, isLoading: usersLoading } = useListUsersQuery();
+
+  const currentUser = currentUserData?.data;
+  const allUsers = usersData?.data || [];
 
   const stats = useMemo(() => {
     const byCategory: Record<RecordCategory, number> = {
@@ -74,6 +84,12 @@ export default function DashboardPage() {
       });
     const totalStudents = students.length;
     const maxCategory = Math.max(...Object.values(byCategory), 1);
+
+    const admins = allUsers.filter((user) => user.role === 'admin');
+    const managers = allUsers.filter((user) => user.role === 'manager');
+    const activeAdmins = admins.filter((u) => u.is_active).length;
+    const activeManagers = managers.filter((u) => u.is_active).length;
+
     return {
       students: totalStudents,
       departments: departments.length,
@@ -85,8 +101,14 @@ export default function DashboardPage() {
       overallRate: totalRecords ? Math.round((totalPresent / totalRecords) * 100) : 0,
       attendanceByCategory,
       sessionsWithAttendance,
+      totalAdmins: admins.length,
+      totalManagers: managers.length,
+      activeAdmins,
+      activeManagers,
+      inactiveAdmins: admins.length - activeAdmins,
+      inactiveManagers: managers.length - activeManagers,
     };
-  }, [students, departments, sessions]);
+  }, [students, departments, sessions, allUsers]);
 
   useEffect(() => {
     setMounted(true);
@@ -126,7 +148,7 @@ export default function DashboardPage() {
     return null;
   }
 
-  const loading = studentsLoading || departmentsLoading || sessionsLoading;
+  const loading = studentsLoading || departmentsLoading || sessionsLoading || usersLoading;
 
   return (
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
@@ -147,7 +169,8 @@ export default function DashboardPage() {
                   <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Overview</h1>
                   <p className="text-sm text-text-secondary mt-0.5">Summary of records and attendance</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <StatisticsViewToggle view={statisticsView} onViewChange={setStatisticsView} />
                   <Link
                     href="/dashboard/records"
                     className="inline-flex min-h-[44px] items-center px-4 py-2.5 text-sm font-medium rounded-xl border border-border/50 text-text-primary bg-card hover:bg-bg-beige-light hover:border-border transition-colors focus:outline-none focus:ring-2 focus:ring-link/30"
@@ -210,66 +233,37 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="grid lg:grid-cols-2 gap-6">
-                <div className="bg-card rounded-2xl border border-border/20 shadow-sm overflow-hidden">
-                  <div className="px-5 py-4 border-b border-border/20">
-                    <h2 className="text-sm font-semibold text-text-primary">Students by category</h2>
-                    <p className="text-xs text-text-secondary mt-0.5">Distribution across categories</p>
-                  </div>
-                  <div className="p-5 space-y-4">
-                    {(Object.keys(CATEGORY_LABELS) as RecordCategory[]).map((cat) => {
-                      const count = stats.byCategory[cat] ?? 0;
-                      const pct = stats.students ? (count / stats.students) * 100 : 0;
-                      return (
-                        <div key={cat} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-text-primary font-medium">{CATEGORY_LABELS[cat]}</span>
-                            <span className="text-text-secondary tabular-nums">{count}</span>
-                          </div>
-                          <div className="h-2 rounded-full bg-border/30 overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${CATEGORY_COLORS[cat]} transition-all duration-500`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {stats.students === 0 && (
-                      <p className="py-6 text-center text-text-secondary text-sm">No students yet</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="bg-card rounded-2xl border border-border/20 shadow-sm overflow-hidden">
-                  <div className="px-5 py-4 border-b border-border/20">
-                    <h2 className="text-sm font-semibold text-text-primary">Attendance by category</h2>
-                    <p className="text-xs text-text-secondary mt-0.5">Present vs total per category</p>
-                  </div>
-                  <div className="p-5 space-y-4">
-                    {(Object.keys(CATEGORY_LABELS) as RecordCategory[]).map((cat) => {
-                      const { present, total } = stats.attendanceByCategory[cat];
-                      const rate = total ? Math.round((present / total) * 100) : 0;
-                      return (
-                        <div key={cat} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-text-primary font-medium">{CATEGORY_LABELS[cat]}</span>
-                            <span className="text-text-secondary tabular-nums">
-                              {present}/{total} · {total ? `${rate}%` : '—'}
-                            </span>
-                          </div>
-                          <div className="h-2 rounded-full bg-border/30 overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${CATEGORY_COLORS[cat]} transition-all duration-500`}
-                              style={{ width: total ? `${rate}%` : '0%' }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+              {statisticsView === 'table' ? (
+                <StatisticsTableView
+                  byCategory={stats.byCategory}
+                  totalStudents={stats.students}
+                  totalDepartments={stats.departments}
+                  totalSessions={stats.sessions}
+                  overallRate={stats.overallRate}
+                  attendancePresent={stats.attendancePresent}
+                  attendanceTotal={stats.attendanceTotal}
+                  totalAdmins={stats.totalAdmins}
+                  totalManagers={stats.totalManagers}
+                  activeAdmins={stats.activeAdmins}
+                  activeManagers={stats.activeManagers}
+                  inactiveAdmins={stats.inactiveAdmins}
+                  inactiveManagers={stats.inactiveManagers}
+                  isSuperAdmin={currentUser?.role === 'super_admin'}
+                />
+              ) : (
+                <StatisticsGraphView
+                  byCategory={stats.byCategory}
+                  totalStudents={stats.students}
+                  maxCategory={stats.maxCategory}
+                  totalAdmins={stats.totalAdmins}
+                  totalManagers={stats.totalManagers}
+                  activeAdmins={stats.activeAdmins}
+                  activeManagers={stats.activeManagers}
+                  inactiveAdmins={stats.inactiveAdmins}
+                  inactiveManagers={stats.inactiveManagers}
+                  isSuperAdmin={currentUser?.role === 'super_admin'}
+                />
+              )}
 
               <div className="bg-card rounded-2xl border border-border/20 shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-border/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
