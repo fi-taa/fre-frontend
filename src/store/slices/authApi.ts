@@ -1,13 +1,13 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from '@/store/baseQuery';
+import { baseQuery } from '@/store/baseQuery';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: baseQueryWithReauth,
+  baseQuery,
   tagTypes: ['Auth'],
   endpoints: (builder) => ({
     login: builder.mutation<
-      { access_token: string; token_type: string },
+      { access_token: string; token_type: string; refresh_token?: string },
       {
         grant_type?: 'password';
         username: string;
@@ -22,7 +22,7 @@ export const authApi = createApi({
         params.append('grant_type', body.grant_type || 'password');
         params.append('username', body.username);
         params.append('password', body.password);
-        
+
         if (body.scope) params.append('scope', body.scope);
         if (body.client_id) params.append('client_id', body.client_id);
         if (body.client_secret) params.append('client_secret', body.client_secret);
@@ -37,7 +37,20 @@ export const authApi = createApi({
         };
       },
     }),
+    refreshToken: builder.mutation<
+      { access_token: string; refresh_token: string; token_type: string },
+      { refresh_token: string }
+    >({
+      query: (body) => ({
+        url: '/auth/refresh',
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useRefreshTokenMutation } = authApi;

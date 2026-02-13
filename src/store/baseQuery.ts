@@ -1,5 +1,6 @@
 import { fetchBaseQuery, FetchBaseQueryError, BaseQueryFn, FetchArgs } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '@/store/store';
+import { setTokens, clearAuth } from './slices/authSlice';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://fre-form.onrender.com/api/v1';
 
@@ -32,10 +33,61 @@ export const baseQueryWithReauth: BaseQueryFn<FetchArgs | string, unknown, Fetch
   if (result.error) {
     const error = result.error as FetchBaseQueryError;
 
-    // Handle 401 Unauthorized
     if (error.status === 401) {
-      // Token expired or invalid
-      api.dispatch({ type: 'auth/clearAuth' });
+      const state = api.getState() as RootState;
+      const refreshToken = state.auth.refresh_token;
+
+      if (refreshToken) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔄 401 Error detected, attempting token refresh...');
+        }
+        try {
+          const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          });
+
+          if (refreshResponse.ok) {
+            const data = (await refreshResponse.json()) as {
+              access_token: string;
+              refresh_token: string;
+              token_type: string;
+            };
+
+            if (process.env.NODE_ENV === 'development') {
+              console.log('✅ Token refresh successful! Retrying original request...');
+            }
+
+            api.dispatch(
+              setTokens({
+                access_token: data.access_token,
+                refresh_token: data.refresh_token,
+                token_type: data.token_type,
+              })
+            );
+
+            result = await baseQuery(args, api, extraOptions);
+          } else {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('❌ Token refresh failed, logging out...');
+            }
+            api.dispatch(clearAuth());
+          }
+        } catch (err) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('❌ Token refresh error:', err);
+          }
+          api.dispatch(clearAuth());
+        }
+      } else {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('❌ No refresh token available, logging out...');
+        }
+        api.dispatch(clearAuth());
+      }
     }
   }
 

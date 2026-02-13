@@ -40,6 +40,7 @@ export function LoginForm() {
         dispatch(setAuthToken({
           access_token: response.access_token,
           token_type: response.token_type || 'Bearer',
+          refresh_token: response.refresh_token,
         }));
 
         await new Promise(resolve => setTimeout(resolve, 100));
