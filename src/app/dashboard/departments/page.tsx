@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
+import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
 import type { RootState } from '@/store/store';
 import { PageLoader } from '@/components/ui/page-loader';
@@ -12,6 +13,7 @@ import {
   useListDepartmentsQuery,
   useDeleteDepartmentMutation,
 } from '@/store/slices/departmentsApi';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 import type { Department } from '@/types';
 
 export default function DepartmentsPage() {
@@ -19,8 +21,29 @@ export default function DepartmentsPage() {
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const { data: departments = [], isLoading } = useListDepartmentsQuery();
+  const { data: allDepartments = [], isLoading } = useListDepartmentsQuery();
+  const { data: currentUserData } = useGetCurrentUserQuery();
   const [deleteDepartment] = useDeleteDepartmentMutation();
+
+  const currentUser = currentUserData?.data;
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isAdmin = currentUser?.role === 'admin';
+  const isManager = currentUser?.role === 'manager';
+  const adminDepartmentIds = currentUser?.department_ids || [];
+  const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
+
+  const departments = useMemo(() => {
+    if (isSuperAdmin) {
+      return allDepartments;
+    }
+    if (isAdmin && adminDepartmentIds.length > 0) {
+      return allDepartments.filter((dept) => adminDepartmentIds.includes(dept.id));
+    }
+    if (isManager && managerDepartmentIds.length > 0) {
+      return allDepartments.filter((dept) => managerDepartmentIds.includes(dept.id));
+    }
+    return [];
+  }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);
 
   useEffect(() => {
     setMounted(true);
@@ -70,6 +93,7 @@ export default function DepartmentsPage() {
   }
 
   const hasData = departments.length > 0 || !isLoading;
+  const canAddDepartment = isSuperAdmin;
 
   return (
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
@@ -92,9 +116,11 @@ export default function DepartmentsPage() {
 
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <h1 className="text-xl font-bold text-text-primary">Departments</h1>
-            <Link href="/dashboard/departments/add" className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30">
-              Add department
-            </Link>
+            {canAddDepartment && (
+              <Link href="/dashboard/departments/add" className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30">
+                Add department
+              </Link>
+            )}
           </div>
 
           <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
@@ -103,9 +129,11 @@ export default function DepartmentsPage() {
             ) : departments.length === 0 ? (
               <div className="p-8 text-center">
                 <p className="text-text-secondary mb-4">No departments yet.</p>
-                <Link href="/dashboard/departments/add" className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90">
-                  Add department
-                </Link>
+                {canAddDepartment && (
+                  <Link href="/dashboard/departments/add" className="inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90">
+                    Add department
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -136,15 +164,19 @@ export default function DepartmentsPage() {
                           {dept.description ?? '—'}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <Link href={`/dashboard/departments/${dept.id}/edit`} className="inline-block px-2 py-1 text-xs font-medium rounded-lg border border-border/40 hover:bg-link/5 text-text-primary mr-1">
-                            Edit
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(dept)}
-                            className="px-2 py-1 text-xs font-medium rounded-lg border border-red-200 hover:bg-red-50 text-red-700"
-                          >
-                            Delete
-                          </button>
+                          {canAddDepartment && (
+                            <>
+                              <Link href={`/dashboard/departments/${dept.id}/edit`} className="inline-block px-2 py-1 text-xs font-medium rounded-lg border border-border/40 hover:bg-link/5 text-text-primary mr-1">
+                                Edit
+                              </Link>
+                              <button
+                                onClick={() => handleDelete(dept)}
+                                className="px-2 py-1 text-xs font-medium rounded-lg border border-red-200 hover:bg-red-50 text-red-700"
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}

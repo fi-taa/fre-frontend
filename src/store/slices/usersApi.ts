@@ -20,6 +20,29 @@ export const usersApi = createApi({
 
     listUsers: builder.query<{ data: User[] }, void>({
       query: () => '/users/',
+      transformResponse: (response: User[] | { data: User[] }): { data: User[] } => {
+        if (Array.isArray(response)) {
+          return { data: response };
+        }
+        if (response && typeof response === 'object' && 'data' in response) {
+          return response as { data: User[] };
+        }
+        return { data: [] };
+      },
+      providesTags: ['User'],
+    }),
+
+    listManagers: builder.query<{ data: User[] }, void>({
+      query: () => '/users/admin/managers',
+      transformResponse: (response: User[] | { data: User[] }): { data: User[] } => {
+        if (Array.isArray(response)) {
+          return { data: response };
+        }
+        if (response && typeof response === 'object' && 'data' in response) {
+          return response as { data: User[] };
+        }
+        return { data: [] };
+      },
       providesTags: ['User'],
     }),
 
@@ -85,6 +108,7 @@ export const usersApi = createApi({
 export const {
   useGetCurrentUserQuery,
   useListUsersQuery,
+  useListManagersQuery,
   useGetUserQuery,
   useCreateUserMutation,
   useCreateManagerMutation,

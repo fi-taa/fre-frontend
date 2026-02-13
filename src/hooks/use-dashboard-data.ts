@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useListStudentsQuery, useDeleteStudentMutation } from '@/store/slices/studentsApi';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 import { sortRecords, filterRecords, studentToRecordView } from '@/lib/data-utils';
 import type { PersonRecord, RecordCategory, SortField, SortDirection } from '@/types';
 
@@ -19,16 +20,34 @@ interface UseDashboardDataReturn {
 
 export function useDashboardData(): UseDashboardDataReturn {
   const { data: students = [], isLoading } = useListStudentsQuery();
+  const { data: currentUserData } = useGetCurrentUserQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [selectedCategory, setSelectedCategory] = useState<RecordCategory | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const records: PersonRecord[] = useMemo(
-    () => students.map(studentToRecordView),
-    [students]
-  );
+  const currentUser = currentUserData?.data;
+  const isAdmin = currentUser?.role === 'admin';
+  const isManager = currentUser?.role === 'manager';
+  const adminDepartmentIds = currentUser?.department_ids || [];
+  const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
+
+  const records: PersonRecord[] = useMemo(() => {
+    let filteredStudents = students;
+    
+    if (isAdmin && adminDepartmentIds.length > 0) {
+      filteredStudents = students.filter((student) => 
+        adminDepartmentIds.includes(student.department_id)
+      );
+    } else if (isManager && managerDepartmentIds.length > 0) {
+      filteredStudents = students.filter((student) => 
+        managerDepartmentIds.includes(student.department_id)
+      );
+    }
+    
+    return filteredStudents.map(studentToRecordView);
+  }, [students, isAdmin, isManager, adminDepartmentIds, managerDepartmentIds]);
 
   const filteredRecords = useMemo(() => {
     let filtered = filterRecords(records, selectedCategory, searchTerm);

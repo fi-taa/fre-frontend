@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { useLoginMutation } from '@/store/slices/authApi';
+import { usersApi } from '@/store/slices/usersApi';
 import { setAuthToken } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/button';
 
@@ -43,6 +44,8 @@ export function LoginForm() {
           refresh_token: response.refresh_token,
         }));
 
+        dispatch(usersApi.util.resetApiState());
+        
         await new Promise(resolve => setTimeout(resolve, 100));
         router.push('/dashboard');
       } else {

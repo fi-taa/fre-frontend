@@ -4,12 +4,13 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
+import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
 import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { UsersTable } from '@/components/dashboard/users-table';
 import { PageLoader } from '@/components/ui/page-loader';
-import { useGetCurrentUserQuery, useListUsersQuery } from '@/store/slices/usersApi';
+import { useGetCurrentUserQuery, useListUsersQuery, useListManagersQuery } from '@/store/slices/usersApi';
 import type { User } from '@/types';
 
 export default function ManagersPage() {
@@ -18,14 +19,21 @@ export default function ManagersPage() {
   const [mounted, setMounted] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { data: currentUserData } = useGetCurrentUserQuery();
-  const { data: usersData, isLoading: usersLoading } = useListUsersQuery();
-
   const currentUser = currentUserData?.data;
-  const allUsers = usersData?.data || [];
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  
+  const { data: allUsersData, isLoading: allUsersLoading, error: allUsersError } = useListUsersQuery(undefined, {
+    skip: !isSuperAdmin,
+  });
+  const { data: managersData, isLoading: managersLoading, error: managersError } = useListManagersQuery(undefined, {
+    skip: isSuperAdmin,
+  });
+
+  const allUsers = isSuperAdmin ? (allUsersData?.data || []) : (managersData?.data || []);
 
   const managers = useMemo(() => {
     const allManagers = allUsers.filter((user) => user.role === 'manager');
-    if (currentUser?.role === 'super_admin') {
+    if (isSuperAdmin) {
       return allManagers;
     }
     if (currentUser?.role === 'admin' && currentUser.department_ids.length > 0) {
@@ -34,7 +42,7 @@ export default function ManagersPage() {
       );
     }
     return [];
-  }, [allUsers, currentUser]);
+  }, [allUsers, currentUser, isSuperAdmin]);
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -91,7 +99,7 @@ export default function ManagersPage() {
     return null;
   }
 
-  const isLoading = usersLoading || !currentUser;
+  const isLoading = (isSuperAdmin ? allUsersLoading : managersLoading) || !currentUser;
   const canAddManager = currentUser?.role === 'admin' || currentUser?.role === 'super_admin';
 
   return (
@@ -155,6 +163,15 @@ export default function ManagersPage() {
           <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
             {isLoading ? (
               <PageLoader className="p-8" />
+            ) : (isSuperAdmin ? allUsersError : managersError) ? (
+              <div className="p-8 text-center">
+                <p className="text-text-secondary mb-2">Unable to load managers.</p>
+                <p className="text-sm text-text-muted">
+                  {(isSuperAdmin ? allUsersError : managersError) && typeof (isSuperAdmin ? allUsersError : managersError) === 'object' && 'data' in (isSuperAdmin ? allUsersError : managersError)
+                    ? String((isSuperAdmin ? allUsersError : managersError as { data?: { detail?: string } }).data?.detail || 'Access denied')
+                    : 'Access denied'}
+                </p>
+              </div>
             ) : (
               <UsersTable users={filteredManagers} userType="manager" isLoading={isLoading} />
             )}

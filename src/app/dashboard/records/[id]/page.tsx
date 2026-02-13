@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
+import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
 import { useGetStudentQuery, useDeleteStudentMutation } from '@/store/slices/studentsApi';
 import { studentToRecordView } from '@/lib/data-utils';

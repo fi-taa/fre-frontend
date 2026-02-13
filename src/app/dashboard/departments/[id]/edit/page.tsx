@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
+import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
 import type { RootState } from '@/store/store';
 import { PageLoader } from '@/components/ui/page-loader';
@@ -12,6 +13,7 @@ import {
   useGetDepartmentQuery,
   useUpdateDepartmentMutation,
 } from '@/store/slices/departmentsApi';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 
 export default function EditDepartmentPage() {
   const router = useRouter();
@@ -41,11 +43,22 @@ export default function EditDepartmentPage() {
     }
   }, [department]);
 
+  const { data: currentUserData } = useGetCurrentUserQuery();
+  const currentUser = currentUserData?.data;
+
   useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    if (currentUser && currentUser.role !== 'super_admin') {
+      router.push('/dashboard/departments');
+      return;
+    }
     if (isAuthenticated && isValidId && isError) {
       router.push('/dashboard/departments');
     }
-  }, [isAuthenticated, isValidId, isError, router]);
+  }, [isAuthenticated, currentUser, isValidId, isError, router]);
 
   function handleLogout() {
     dispatch(clearAuth());

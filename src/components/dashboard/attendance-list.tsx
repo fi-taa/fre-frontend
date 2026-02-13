@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useListAttendanceSessionsQuery, useGetAttendanceSessionQuery } from '@/store/slices/attendanceApi';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 import { useListStudentsQuery } from '@/store/slices/studentsApi';
 import { apiCategoryToSlug, CATEGORY_API_VALUES } from '@/types';
 import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
@@ -60,7 +61,29 @@ export function AttendanceList(_props: AttendanceListProps) {
     return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [sessions, dateFilter, dateRangeStart, dateRangeEnd]);
 
-  const { data: departments = [] } = useListDepartmentsQuery();
+  const { data: allDepartments = [] } = useListDepartmentsQuery();
+  const { data: currentUserData } = useGetCurrentUserQuery();
+  
+  const currentUser = currentUserData?.data;
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isAdmin = currentUser?.role === 'admin';
+  const isManager = currentUser?.role === 'manager';
+  const adminDepartmentIds = currentUser?.department_ids || [];
+  const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
+  
+  const departments = useMemo(() => {
+    if (isSuperAdmin) {
+      return allDepartments;
+    }
+    if (isAdmin && adminDepartmentIds.length > 0) {
+      return allDepartments.filter((d) => adminDepartmentIds.includes(d.id));
+    }
+    if (isManager && managerDepartmentIds.length > 0) {
+      return allDepartments.filter((d) => managerDepartmentIds.includes(d.id));
+    }
+    return [];
+  }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);
+  
   const departmentMap = useMemo(() => new Map(departments.map((d) => [d.id, d.name])), [departments]);
 
   const hasActiveFilters =

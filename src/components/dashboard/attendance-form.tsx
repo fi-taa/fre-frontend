@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 import {
   useGetEligibleStudentsQuery,
   useCreateAttendanceBatchMutation,
@@ -33,7 +34,28 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
   const [globalNotes, setGlobalNotes] = useState('');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const { data: departments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
+  const { data: allDepartments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
+  const { data: currentUserData } = useGetCurrentUserQuery();
+  
+  const currentUser = currentUserData?.data;
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isAdmin = currentUser?.role === 'admin';
+  const isManager = currentUser?.role === 'manager';
+  const adminDepartmentIds = currentUser?.department_ids || [];
+  const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
+  
+  const departments = useMemo(() => {
+    if (isSuperAdmin) {
+      return allDepartments;
+    }
+    if (isAdmin && adminDepartmentIds.length > 0) {
+      return allDepartments.filter((d) => adminDepartmentIds.includes(d.id));
+    }
+    if (isManager && managerDepartmentIds.length > 0) {
+      return allDepartments.filter((d) => managerDepartmentIds.includes(d.id));
+    }
+    return [];
+  }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);
   const departmentIdNum = departmentId ? parseInt(departmentId, 10) : 0;
   const categoryApi = category ? CATEGORY_API_VALUES[category] : '';
   const canFetchEligible =

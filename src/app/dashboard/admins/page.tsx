@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { clearAuth } from '@/store/slices/authSlice';
+import { handleLogout as logoutAndResetCache } from '@/lib/auth-helpers';
 import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { UsersTable } from '@/components/dashboard/users-table';
@@ -55,8 +55,8 @@ export default function AdminsPage() {
     }
   }, [mounted, isAuthenticated, currentUser, router]);
 
-  function handleLogout() {
-    dispatch(clearAuth());
+  function onLogout() {
+    logoutAndResetCache(dispatch);
     router.push('/login');
   }
 
@@ -80,7 +80,7 @@ export default function AdminsPage() {
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
         <div className="relative z-10">
-          <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+          <DashboardHeader onLogout={onLogout} onNotifications={handleNotifications} notificationCount={0} />
         </div>
         <div className="flex-1 flex items-center justify-center relative z-10">
           <PageLoader />
@@ -99,7 +99,7 @@ export default function AdminsPage() {
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
       <div className="relative z-10">
-        <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+        <DashboardHeader onLogout={onLogout} onNotifications={handleNotifications} notificationCount={0} />
       </div>
       <div className="flex-1 overflow-auto relative z-10">
         <div className="max-w-4xl mx-auto p-6 space-y-6">

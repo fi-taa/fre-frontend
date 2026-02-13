@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { clearAuth } from '@/store/slices/authSlice';
+import { handleLogout as logoutAndResetCache } from '@/lib/auth-helpers';
 import type { RootState } from '@/store/store';
 import { PageLoader } from '@/components/ui/page-loader';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
@@ -31,8 +31,8 @@ export default function ProfilePage() {
     }
   }, [mounted, isAuthenticated, router]);
 
-  function handleLogout() {
-    dispatch(clearAuth());
+  function onLogout() {
+    logoutAndResetCache(dispatch);
     router.push('/login');
   }
 
@@ -45,7 +45,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
         <div className="relative z-10">
-          <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+          <DashboardHeader onLogout={onLogout} onNotifications={handleNotifications} notificationCount={0} />
         </div>
         <div className="flex-1 flex items-center justify-center relative z-10">
           <PageLoader />

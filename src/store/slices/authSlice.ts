@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { usersApi } from './usersApi';
 
 const AUTH_STORAGE_KEY = 'auth_token';
 const REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';

@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
+import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
 import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { useCreateDepartmentMutation } from '@/store/slices/departmentsApi';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 
 export default function AddDepartmentPage() {
   const router = useRouter();
@@ -18,12 +20,19 @@ export default function AddDepartmentPage() {
   const [error, setError] = useState<string | null>(null);
   const [createDepartment, { isLoading }] = useCreateDepartmentMutation();
 
+  const { data: currentUserData } = useGetCurrentUserQuery();
+  const currentUser = currentUserData?.data;
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
-  }, [isAuthenticated, router]);
+    if (currentUser && currentUser.role !== 'super_admin') {
+      router.push('/dashboard/departments');
+      return;
+    }
+  }, [isAuthenticated, currentUser, router]);
 
   function handleLogout() {
     dispatch(clearAuth());
