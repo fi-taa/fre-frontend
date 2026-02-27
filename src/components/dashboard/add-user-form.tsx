@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
 import type { Department } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface AddUserFormProps {
   userType: 'admin' | 'manager';
@@ -13,6 +14,7 @@ interface AddUserFormProps {
 }
 
 export function AddUserForm({ userType, allowedDepartmentIds, onSubmit, onCancel, isLoading = false }: AddUserFormProps) {
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -34,28 +36,28 @@ export function AddUserForm({ userType, allowedDepartmentIds, onSubmit, onCancel
     const trimmedFullName = fullName.trim();
 
     if (!trimmedEmail) {
-      setError('Email is required');
+      setError(t('error.emailRequired'));
       return;
     }
 
     if (!trimmedEmail.includes('@')) {
-      setError('Please enter a valid email address');
+      setError(t('error.emailInvalid'));
       return;
     }
 
     if (!trimmedFullName) {
-      setError('Full name is required');
+      setError(t('error.fullNameRequired'));
       return;
     }
 
     if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('error.passwordMinLength'));
       return;
     }
 
     const deptId = parseInt(departmentId, 10);
     if (!departmentId || isNaN(deptId)) {
-      setError('Department is required');
+      setError(t('error.departmentRequired'));
       return;
     }
 
@@ -70,10 +72,10 @@ export function AddUserForm({ userType, allowedDepartmentIds, onSubmit, onCancel
       const data = err && typeof err === 'object' && 'data' in err ? (err as { data?: { detail?: unknown } }).data : undefined;
       const detail = data?.detail;
       const message = Array.isArray(detail)
-        ? detail.map((d: { msg?: string }) => d.msg).filter(Boolean).join('. ') || `Failed to create ${userType}`
+        ? detail.map((d: { msg?: string }) => d.msg).filter(Boolean).join('. ') || t(userType === 'admin' ? 'error.createAdminFailed' : 'error.createManagerFailed')
         : typeof detail === 'string'
           ? detail
-          : `Failed to create ${userType}`;
+          : t(userType === 'admin' ? 'error.createAdminFailed' : 'error.createManagerFailed');
       setError(message);
     }
   }

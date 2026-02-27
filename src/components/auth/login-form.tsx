@@ -7,10 +7,12 @@ import { useLoginMutation } from '@/store/slices/authApi';
 import { usersApi } from '@/store/slices/usersApi';
 import { setAuthToken } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n/I18nProvider';
 
 export function LoginForm() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useI18n();
   const [login, { isLoading }] = useLoginMutation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -22,12 +24,12 @@ export function LoginForm() {
     setError('');
 
     if (!username.trim()) {
-      setError('Username is required');
+      setError(t('error.usernameRequired'));
       return;
     }
 
     if (!password) {
-      setError('Password is required');
+      setError(t('error.passwordRequired'));
       return;
     }
 
@@ -49,10 +51,10 @@ export function LoginForm() {
         await new Promise(resolve => setTimeout(resolve, 100));
         router.push('/dashboard');
       } else {
-        setError('Invalid login response. Please try again.');
+        setError(t('error.loginInvalidResponse'));
       }
     } catch (err) {
-      let errorMessage = 'Login failed. Please try again.';
+      let errorMessage = t('error.loginFailed');
       
       if (err && typeof err === 'object') {
         const error = err as any;
@@ -70,25 +72,25 @@ export function LoginForm() {
           }
           // Handle object detail
           else if (detail && typeof detail === 'object' && 'msg' in detail) {
-            errorMessage = detail.msg;
+            errorMessage = (detail as { msg?: string }).msg || t('error.loginFailed');
           }
         } else if (error.data?.message) {
           errorMessage = error.data.message;
         } 
         // Check for network/request errors
         else if (error.status === undefined) {
-          errorMessage = 'Network error. Please check your connection and try again.';
+          errorMessage = t('error.network');
         }
         // HTTP status codes
         else if (error.status) {
           const statusMessages: Record<number, string> = {
-            400: 'Invalid request. Please check your inputs.',
-            401: 'Incorrect email or password',
-            403: 'Access denied',
-            404: 'User not found',
-            500: 'Server error. Please try again later.',
+            400: t('error.http.400'),
+            401: t('error.http.401'),
+            403: t('error.http.403'),
+            404: t('error.http.404'),
+            500: t('error.http.500'),
           };
-          errorMessage = statusMessages[error.status] || `Error: ${error.status}`;
+          errorMessage = statusMessages[error.status] || `${t('error.http.generic')} ${error.status}`;
         }
       }
       

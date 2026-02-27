@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface AddRecordModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AddRecordModalProps {
 }
 
 export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) {
+  const { t } = useI18n();
   const [name, setName] = useState('');
   const [church, setChurch] = useState('');
   const [age, setAge] = useState('');
@@ -24,18 +26,18 @@ export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) 
     setError('');
 
     if (!name.trim()) {
-      setError('Name is required');
+      setError(t('error.nameRequired'));
       return;
     }
 
     if (!church.trim()) {
-      setError('Church is required');
+      setError(t('error.churchRequired'));
       return;
     }
 
     const ageNum = parseInt(age, 10);
     if (!age || isNaN(ageNum) || ageNum < 0) {
-      setError('Valid age is required');
+      setError(t('error.ageRequired'));
       return;
     }
 
@@ -159,7 +161,7 @@ export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) 
                 htmlFor="category"
                 className="block text-sm font-medium mb-2 text-text-primary"
               >
-                Category
+                {t('filters.category')}
               </label>
               <select
                 id="category"
@@ -170,7 +172,7 @@ export function AddRecordModal({ isOpen, onClose, onAdd }: AddRecordModalProps) 
               >
                 {RECORD_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {CATEGORY_LABELS[cat]}
+                    {t(CATEGORY_LABELS[cat])}
                   </option>
                 ))}
               </select>

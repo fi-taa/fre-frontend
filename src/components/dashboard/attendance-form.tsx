@@ -11,6 +11,7 @@ import {
 import { RECORD_CATEGORIES, CATEGORY_LABELS, CATEGORY_API_VALUES } from '@/types';
 import type { RecordCategory } from '@/types';
 import type { Student } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface AttendanceFormProps {
   onSuccess: () => void;
@@ -19,6 +20,7 @@ interface AttendanceFormProps {
 }
 
 export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormProps) {
+  const { t } = useI18n();
   const today = new Date().toISOString().split('T')[0];
   const [departmentId, setDepartmentId] = useState<string>('');
   const [programId, setProgramId] = useState<string>('');
@@ -106,12 +108,12 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
     e.preventDefault();
     setSubmitError(null);
     if (!departmentId || !programId || !category) {
-      setSubmitError('Select department, program, and category.');
+      setSubmitError(t('error.attendance.missingSelections'));
       return;
     }
     const progId = parseInt(programId, 10);
     if (isNaN(progId)) {
-      setSubmitError('Invalid program.');
+      setSubmitError(t('error.attendance.invalidProgram'));
       return;
     }
     const records = eligibleStudents.map((s: Student) => {
@@ -123,7 +125,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
       };
     });
     if (records.every((r) => r.status !== 'PRESENT')) {
-      setSubmitError('Mark at least one person present, or add records for absent.');
+      setSubmitError(t('error.attendance.noPresent'));
       return;
     }
     try {
@@ -139,8 +141,8 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
     } catch (err: unknown) {
       const message =
         err && typeof err === 'object' && 'data' in err
-          ? String((err as { data?: { detail?: unknown } }).data?.detail ?? 'Failed to save')
-          : 'Failed to save attendance';
+          ? String((err as { data?: { detail?: unknown } }).data?.detail ?? t('error.attendance.saveFailed'))
+          : t('error.attendance.saveFailed');
       setSubmitError(message);
     }
   }
@@ -152,11 +154,11 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <label htmlFor="att-dept" className="block text-xs font-medium mb-1.5 text-text-secondary">
-            Department <span className="text-error">*</span>
+            {t('filters.department')} <span className="text-error">*</span>
           </label>
           {departmentsLoading ? (
             <div className="h-9 px-3 rounded-lg border border-border/40 bg-bg-beige-light flex items-center text-xs text-text-secondary">
-              Loading...
+              {t('attendance.loadingDepartments')}
             </div>
           ) : departments.length === 0 ? (
             <input
@@ -168,7 +170,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
                 setDepartmentId(e.target.value);
                 setProgramId('');
               }}
-              placeholder="Department ID"
+              placeholder={t('attendance.departmentIdPlaceholder')}
               className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             />
           ) : (
@@ -182,7 +184,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
               required
               className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             >
-              <option value="">Choose department</option>
+              <option value="">{t('Choose department')}</option>
               {departments.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -193,15 +195,15 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
         </div>
         <div>
           <label htmlFor="att-program" className="block text-xs font-medium mb-1.5 text-text-secondary">
-            Program <span className="text-error">*</span>
+            {t('attendance.program')} <span className="text-error">*</span>
           </label>
           {programsLoading || departmentIdNum <= 0 ? (
             <div className="h-9 px-3 rounded-lg border border-border/40 bg-bg-beige-light flex items-center text-xs text-text-secondary">
-              {departmentIdNum <= 0 ? 'Select department first' : 'Loading...'}
+              {departmentIdNum <= 0 ? t('attendance.selectDepartmentFirst') : t('attendance.loadingPrograms')}
             </div>
           ) : programs.length === 0 ? (
             <div className="h-9 px-3 rounded-lg border border-border/40 bg-bg-beige-light flex items-center text-xs text-text-secondary">
-              No programs
+              {t('attendance.noPrograms')}
             </div>
           ) : (
             <select
@@ -211,7 +213,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
               required
               className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             >
-              <option value="">Choose program</option>
+              <option value="">{t('attendance.chooseProgram')}</option>
               {programs.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -222,7 +224,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
         </div>
         <div>
           <label htmlFor="att-date" className="block text-xs font-medium mb-1.5 text-text-secondary">
-            Date <span className="text-error">*</span>
+            {t('attendance.date')} <span className="text-error">*</span>
           </label>
           <input
             id="att-date"
@@ -235,7 +237,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
         </div>
         <div>
           <label htmlFor="att-category" className="block text-xs font-medium mb-1.5 text-text-secondary">
-            Category <span className="text-error">*</span>
+            {t('filters.category')} <span className="text-error">*</span>
           </label>
           <select
             id="att-category"
@@ -244,10 +246,10 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
             required
             className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
           >
-            <option value="">Choose category</option>
+            <option value="">{t('filters.category')}</option>
             {RECORD_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
-                {CATEGORY_LABELS[cat]}
+                {t(CATEGORY_LABELS[cat])}
               </option>
             ))}
           </select>
@@ -262,7 +264,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search students..."
+                placeholder={t('attendance.searchStudents')}
                 className="w-full h-9 pl-8 pr-8 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               />
               <svg
@@ -281,21 +283,21 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
             </div>
             <div className="flex gap-2 items-center flex-wrap">
               <span className="text-xs text-text-secondary">
-                {selectedCount} present · {filteredStudents.length} eligible
+                {selectedCount} {t('attendance.present')} · {filteredStudents.length} {t('attendance.eligible')}
               </span>
               <button
                 type="button"
                 onClick={() => setAllPresent(true)}
                 className="px-2 py-1 text-xs font-medium rounded-lg border border-border/40 hover:bg-link/5 text-text-primary"
               >
-                All present
+                {t('attendance.allPresent')}
               </button>
               <button
                 type="button"
                 onClick={() => setAllPresent(false)}
                 className="px-2 py-1 text-xs font-medium rounded-lg border border-border/40 hover:bg-link/5 text-text-primary"
               >
-                All absent
+                {t('attendance.allAbsent')}
               </button>
             </div>
           </div>
@@ -303,9 +305,13 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
           <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
             <div className="max-h-[400px] overflow-y-auto">
               {eligibleLoading ? (
-                <div className="p-6 text-center text-sm text-text-secondary">Loading eligible students...</div>
+                <div className="p-6 text-center text-sm text-text-secondary">
+                  {t('attendance.loadingEligible')}
+                </div>
               ) : filteredStudents.length === 0 ? (
-                <div className="p-6 text-center text-sm text-text-secondary">No eligible students</div>
+                <div className="p-6 text-center text-sm text-text-secondary">
+                  {t('attendance.noEligible')}
+                </div>
               ) : (
                 <ul className="divide-y divide-border/30">
                   {filteredStudents.map((student: Student) => {
@@ -322,11 +328,13 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
                           <div className="text-sm font-medium text-text-primary truncate">
                             {student.name}
                             {isInitial && (
-                              <span className="ml-1 text-xs text-accent">(this record)</span>
+                              <span className="ml-1 text-xs text-accent">
+                                {t('attendance.thisRecord')}
+                              </span>
                             )}
                           </div>
                           <div className="text-xs text-text-secondary">
-                            {student.church ?? '—'} · Age {student.age}
+                            {student.church ?? '—'} · {t('attendance.ageLabel')} {student.age}
                           </div>
                         </div>
                         <div className="flex gap-1.5 shrink-0">
@@ -337,7 +345,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
                               present ? 'bg-green-100 text-green-800' : 'bg-bg-beige-light text-text-secondary hover:bg-green-50'
                             }`}
                           >
-                            Present
+                            {t('attendance.present')}
                           </button>
                           <button
                             type="button"
@@ -346,7 +354,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
                               !present ? 'bg-red-100 text-red-800' : 'bg-bg-beige-light text-text-secondary hover:bg-red-50'
                             }`}
                           >
-                            Absent
+                            {t('attendance.absent')}
                           </button>
                         </div>
                       </li>
@@ -359,14 +367,14 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
 
           <div>
             <label htmlFor="att-notes" className="block text-xs font-medium mb-1.5 text-text-secondary">
-              Notes (optional, applied to all)
+              {t('attendance.notesLabel')}
             </label>
             <textarea
               id="att-notes"
               value={globalNotes}
               onChange={(e) => setGlobalNotes(e.target.value)}
               rows={2}
-              placeholder="Optional notes for this session..."
+              placeholder={t('attendance.notesPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             />
           </div>
@@ -383,7 +391,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
           disabled={!isFormValid || isSubmitting}
           className="px-4 py-2 text-sm font-medium rounded-lg bg-accent text-text-light hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent/30"
         >
-          {isSubmitting ? 'Saving...' : 'Save attendance'}
+          {isSubmitting ? t('attendance.saving') : t('attendance.saveButton')}
         </button>
       </div>
     </form>

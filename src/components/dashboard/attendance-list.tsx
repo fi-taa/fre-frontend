@@ -11,6 +11,7 @@ import { apiCategoryToSlug, CATEGORY_API_VALUES } from '@/types';
 import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
 import type { AttendanceSession } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface AttendanceListProps {
   recordId?: string;
@@ -18,6 +19,7 @@ interface AttendanceListProps {
 }
 
 export function AttendanceList(_props: AttendanceListProps) {
+  const { t } = useI18n();
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<RecordCategory | 'all'>('all');
   const [programFilter, setProgramFilter] = useState<string>('');
@@ -124,15 +126,15 @@ export function AttendanceList(_props: AttendanceListProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
-            showFilters || hasActiveFilters
-              ? 'bg-accent text-text-light border-accent'
-              : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
-          }`}
-        >
-          Filters
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30 ${
+              showFilters || hasActiveFilters
+                ? 'bg-accent text-text-light border-accent'
+                : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
+            }`}
+          >
+            {t('filters.title')}
           {activeFilterCount > 0 && (
             <span className="ml-1.5 px-1.5 py-0.5 text-xs rounded-full bg-text-light/20">
               {activeFilterCount}
@@ -144,7 +146,7 @@ export function AttendanceList(_props: AttendanceListProps) {
             onClick={clearAllFilters}
             className="px-3 py-2 text-sm font-medium rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 focus:outline-none focus:ring-2 focus:ring-link/30 text-text-primary whitespace-nowrap"
           >
-            Clear all
+            {t('filters.clearAll')}
           </button>
         )}
       </div>
@@ -154,7 +156,7 @@ export function AttendanceList(_props: AttendanceListProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div>
               <label htmlFor="list-dept" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                Department
+                {t('filters.department')}
               </label>
               <select
                 id="list-dept"
@@ -165,7 +167,7 @@ export function AttendanceList(_props: AttendanceListProps) {
                 }}
                 className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               >
-                <option value="">All</option>
+                <option value="">{t('filters.all')}</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -175,7 +177,7 @@ export function AttendanceList(_props: AttendanceListProps) {
             </div>
             <div>
               <label htmlFor="list-category" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                Category
+                {t('filters.category')}
               </label>
               <select
                 id="list-category"
@@ -183,7 +185,7 @@ export function AttendanceList(_props: AttendanceListProps) {
                 onChange={(e) => setCategoryFilter((e.target.value || 'all') as RecordCategory | 'all')}
                 className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               >
-                <option value="all">All</option>
+                <option value="all">{t('filters.all')}</option>
                 {RECORD_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
                     {CATEGORY_LABELS[cat]}
@@ -193,7 +195,7 @@ export function AttendanceList(_props: AttendanceListProps) {
             </div>
             <div>
               <label htmlFor="list-program" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                Program
+                {t('filters.program')}
               </label>
               <select
                 id="list-program"
@@ -211,7 +213,7 @@ export function AttendanceList(_props: AttendanceListProps) {
             </div>
             <div>
               <label htmlFor="list-date" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                Date
+                {t('filters.date')}
               </label>
               <input
                 id="list-date"
@@ -227,7 +229,7 @@ export function AttendanceList(_props: AttendanceListProps) {
             </div>
             <div>
               <label htmlFor="list-dateStart" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                From
+                {t('filters.from')}
               </label>
               <input
                 id="list-dateStart"
@@ -242,7 +244,7 @@ export function AttendanceList(_props: AttendanceListProps) {
             </div>
             <div>
               <label htmlFor="list-dateEnd" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                To
+                {t('filters.to')}
               </label>
               <input
                 id="list-dateEnd"
@@ -262,30 +264,30 @@ export function AttendanceList(_props: AttendanceListProps) {
 
       <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
         {!hasSessions ? (
-          <div className="p-8 text-center text-text-secondary text-sm">Loading sessions...</div>
+          <div className="p-8 text-center text-text-secondary text-sm">{t('attendance.loadingSessions')}</div>
         ) : (
           <>
-            <div className="px-4 py-2 border-b border-border/30 bg-table-header text-xs text-text-secondary">
-              {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''}
+              <div className="px-4 py-2 border-b border-border/30 bg-table-header text-xs text-text-secondary">
+              {filteredSessions.length} {t(filteredSessions.length !== 1 ? 'attendance.sessionsLabel' : 'attendance.sessionLabel')}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-table-header border-b border-border/50">
                   <tr>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                      Date
+                      {t('attendance.date')}
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                      Department
+                      {t('attendance.department')}
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                      Category
+                      {t('attendance.category')}
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                      Program
+                      {t('attendance.program')}
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                      Records
+                      {t('attendance.records')}
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary w-20">
                       —
@@ -296,7 +298,7 @@ export function AttendanceList(_props: AttendanceListProps) {
                   {filteredSessions.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-4 py-8 text-center text-text-secondary text-sm">
-                        No sessions found
+                        {t('attendance.noSessions')}
                       </td>
                     </tr>
                   ) : (
@@ -368,22 +370,23 @@ interface SessionDetailProps {
 }
 
 function SessionDetail({ sessionId }: SessionDetailProps) {
+  const { t } = useI18n();
   const { data: session, isLoading } = useGetAttendanceSessionQuery(sessionId);
   const { data: students = [] } = useListStudentsQuery();
   const studentMap = useMemo(() => new Map(students.map((s) => [s.id, s])), [students]);
 
   if (isLoading || !session) {
     return (
-      <div className="px-4 py-3 text-sm text-text-secondary">Loading...</div>
+      <div className="px-4 py-3 text-sm text-text-secondary">{t('attendance.loadingRecords')}</div>
     );
   }
 
   return (
     <div className="px-4 py-3 border-t border-border/30">
-      <div className="text-xs font-medium text-text-secondary mb-2">Session records</div>
+      <div className="text-xs font-medium text-text-secondary mb-2">{t('attendance.sessionRecords')}</div>
       <ul className="space-y-1.5 max-h-48 overflow-y-auto">
         {session.records.length === 0 ? (
-          <li className="text-sm text-text-secondary">No records</li>
+          <li className="text-sm text-text-secondary">{t('attendance.noRecords')}</li>
         ) : (
           session.records.map((rec) => {
             const student = studentMap.get(rec.student_id);

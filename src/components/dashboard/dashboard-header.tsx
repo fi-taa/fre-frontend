@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SkipToContent } from '@/components/dashboard/skip-to-content';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface DashboardHeaderProps {
   onLogout?: () => void;
@@ -29,6 +30,7 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   const [greeting, setGreeting] = useState('');
   const pathname = usePathname();
+  const { locale, setLocale, t } = useI18n();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { data: currentUserData, isLoading: isLoadingUser, error: userError } = useGetCurrentUserQuery(undefined, {
     skip: !isAuthenticated,
@@ -177,115 +179,147 @@ export function DashboardHeader({
         className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border/20 shadow-sm"
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
-      <div className="flex h-14 min-h-[56px] items-center justify-between gap-2 px-4">
-        <div className="flex items-center gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 rounded-full text-text-primary hover:bg-black/5 active:bg-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-link/30 focus:ring-offset-2 focus:ring-offset-transparent"
-                aria-label="Menu"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56 rounded-2xl shadow-lg border border-border/20">
-              {menuItems.map((item) => {
-                const isActive = item.href === '/dashboard'
-                  ? pathname === '/dashboard'
-                  : pathname === item.href || pathname?.startsWith(`${item.href}/`);
-                return (
-                  <DropdownMenuItem key={item.href} asChild>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center gap-3 py-2.5 ${
-                        isActive ? 'bg-accent/10 text-accent' : ''
-                      }`}
-                    >
-                      <span className={`flex h-9 w-9 items-center justify-center rounded-full ${isActive ? 'bg-accent/15' : 'bg-bg-beige-light'}`}>
-                        {item.icon}
-                      </span>
-                      {item.label}
-                    </Link>
-                  </DropdownMenuItem>
-                );
-              })}
-              <DropdownMenuSeparator className="my-1" />
-              <DropdownMenuItem onClick={onLogout} className="py-2.5 gap-3 text-error focus:text-error focus:bg-error/10">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-error/10">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
+        <div className="flex h-14 min-h-[56px] items-center justify-between gap-2 px-4">
+          <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 rounded-full text-text-primary hover:bg-black/5 active:bg-black/10 transition-colors focus:outline-none focus:ring-2 focus:ring-link/30 focus:ring-offset-2 focus:ring-offset-transparent"
+                  aria-label="Menu"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
                   </svg>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56 rounded-2xl shadow-lg border border-border/20">
+                {menuItems.map((item) => {
+                  const isActive = item.href === '/dashboard'
+                    ? pathname === '/dashboard'
+                    : pathname === item.href || pathname?.startsWith(`${item.href}/`);
+                  return (
+                    <DropdownMenuItem key={item.href} asChild>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-3 py-2.5 ${
+                          isActive ? 'bg-accent/10 text-accent' : ''
+                        }`}
+                      >
+                        <span className={`flex h-9 w-9 items-center justify-center rounded-full ${isActive ? 'bg-accent/15' : 'bg-bg-beige-light'}`}>
+                          {item.icon}
+                        </span>
+                        {t(item.label)}
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+                <DropdownMenuSeparator className="my-1" />
+                <DropdownMenuItem onClick={onLogout} className="py-2.5 gap-3 text-error focus:text-error focus:bg-error/10">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-error/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                  </span>
+                  {t('nav.logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="hidden lg:flex flex-col items-start">
+              <h1 className="text-lg font-semibold text-text-primary tabular-nums leading-tight">
+                {t('app.title')}
+              </h1>
+              {greeting && (
+                <span className="text-xs text-text-secondary font-medium tabular-nums">
+                  {greeting}
                 </span>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              )}
+            </div>
 
-          <div className="hidden lg:flex flex-col items-start">
-            <h1 className="text-lg font-semibold text-text-primary tabular-nums leading-tight">
-              ፍሬ ሃይማኖት መዝገብ
-            </h1>
-            {greeting && (
-              <span className="text-xs text-text-secondary font-medium tabular-nums">
-                {greeting}
-              </span>
-            )}
+            <nav className="hidden lg:flex items-center gap-1">
+              {menuItems.map((item) => (
+                <NavLink key={item.href} href={item.href} icon={item.icon}>
+                  {t(item.label)}
+                </NavLink>
+              ))}
+            </nav>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-1">
-            {menuItems.map((item) => (
-              <NavLink key={item.href} href={item.href} icon={item.icon}>
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+          <div className="flex flex-1 min-w-0 items-center justify-center lg:hidden">
+            <div className="flex flex-col items-center">
+              <h1 className="text-lg font-semibold text-text-primary truncate tabular-nums leading-tight">
+                {t('app.title')}
+              </h1>
+              {greeting && (
+                <span className="text-xs text-text-secondary font-medium tabular-nums">
+                  {greeting}
+                </span>
+              )}
+            </div>
+          </div>
 
-        <div className="flex flex-1 min-w-0 items-center justify-center lg:hidden">
-          <div className="flex flex-col items-center">
-            <h1 className="text-lg font-semibold text-text-primary truncate tabular-nums leading-tight">
-              ፍሬ ሃይማኖት መዝገብ
-            </h1>
-            {greeting && (
-              <span className="text-xs text-text-secondary font-medium tabular-nums">
-                {greeting}
-              </span>
-            )}
+          <div className="flex items-center justify-end gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5 rounded-full bg-bg-beige-light px-3 py-1.5 text-xs font-medium text-text-primary hover:bg-bg-beige-light/80 transition-colors focus:outline-none focus:ring-2 focus:ring-link/30 min-h-[44px]"
+                  aria-label="Language"
+                  aria-haspopup="listbox"
+                >
+                  <span>
+                    {locale === 'am' ? 'አማ' : locale === 'om' ? 'AfO' : 'EN'}
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[120px] rounded-xl shadow-lg border border-border/20">
+                {[
+                  { code: 'am' as const, label: 'አማ (Amharic)' },
+                  { code: 'om' as const, label: 'Afaan Oromo' },
+                  { code: 'en' as const, label: 'English' },
+                ].map((option) => (
+                  <DropdownMenuItem
+                    key={option.code}
+                    onClick={() => setLocale(option.code)}
+                    className={`py-2.5 cursor-pointer ${locale === option.code ? 'bg-accent/10 text-accent font-medium' : ''}`}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <button
+              onClick={onLogout}
+              className="hidden lg:flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg text-error hover:bg-error/10 transition-colors focus:outline-none focus:ring-2 focus:ring-error/30"
+              aria-label={t('nav.logout')}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span className="hidden xl:inline">{t('nav.logout')}</span>
+            </button>
+            <Link
+              href="/dashboard/add"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-accent text-text-light hover:opacity-90 active:opacity-80 transition-opacity shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
+              aria-label={t('nav.addRecord')}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+              </svg>
+            </Link>
           </div>
         </div>
-
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={onLogout}
-            className="hidden lg:flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg text-error hover:bg-error/10 transition-colors focus:outline-none focus:ring-2 focus:ring-error/30"
-            aria-label="Logout"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            <span className="hidden xl:inline">Logout</span>
-          </button>
-          <Link
-            href="/dashboard/add"
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-accent text-text-light hover:opacity-90 active:opacity-80 transition-opacity shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-transparent"
-            aria-label="Add record"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14" />
-              <path d="M12 5v14" />
-            </svg>
-          </Link>
-        </div>
-      </div>
-    </header>
+      </header>
     </>
   );
 }

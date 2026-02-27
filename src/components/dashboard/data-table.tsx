@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { TableRow } from './table-row';
 import { PaginationControls } from './pagination-controls';
 import type { PersonRecord, SortField } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface DataTableProps {
   records: PersonRecord[];
@@ -30,6 +31,7 @@ export function DataTable({
   canGoPrevious,
   canGoNext,
 }: DataTableProps) {
+  const { t } = useI18n();
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
       return (
@@ -94,7 +96,7 @@ export function DataTable({
       />
       <div className="sm:hidden relative z-10 p-3 space-y-2">
         {records.length === 0 ? (
-          <div className="py-8 text-center text-text-secondary text-sm">No records found</div>
+          <div className="py-8 text-center text-text-secondary text-sm">{t('records.empty')}</div>
         ) : (
           <>
             {records.map((record) => (
@@ -166,7 +168,7 @@ export function DataTable({
               <tr>
                 <td colSpan={4} className="px-3 py-8 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="text-text-secondary text-sm">No records found</div>
+                    <div className="text-text-secondary text-sm">{t('records.empty')}</div>
                   </div>
                 </td>
               </tr>

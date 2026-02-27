@@ -2,6 +2,7 @@
 
 import { CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface StatisticsTableViewProps {
   byCategory: Record<RecordCategory, number>;
@@ -33,31 +34,39 @@ export function StatisticsTableView({
   inactiveManagers,
   isSuperAdmin,
 }: StatisticsTableViewProps) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-6">
       <div className="bg-card rounded-2xl border border-border/20 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-border/20">
-          <h2 className="text-sm font-semibold text-text-primary">Summary Statistics</h2>
+          <h2 className="text-sm font-semibold text-text-primary">
+            {t('dashboard.table.summaryTitle')}
+          </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-table-header border-b border-border/50">
               <tr>
                 <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Metric
+                  {t('dashboard.table.metric')}
                 </th>
                 <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Value
+                  {t('dashboard.table.value')}
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
-                <td className="px-5 py-3 text-sm font-medium text-text-primary">Total Students</td>
+                <td className="px-5 py-3 text-sm font-medium text-text-primary">
+                  {t('dashboard.table.totalStudents')}
+                </td>
                 <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{totalStudents}</td>
               </tr>
               <tr className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
-                <td className="px-5 py-3 text-sm font-medium text-text-primary">Total Departments</td>
+                <td className="px-5 py-3 text-sm font-medium text-text-primary">
+                  {t('dashboard.table.totalDepartments')}
+                </td>
                 <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{totalDepartments}</td>
               </tr>
             </tbody>
@@ -67,20 +76,22 @@ export function StatisticsTableView({
 
       <div className="bg-card rounded-2xl border border-border/20 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-border/20">
-          <h2 className="text-sm font-semibold text-text-primary">Students by Category</h2>
+          <h2 className="text-sm font-semibold text-text-primary">
+            {t('dashboard.table.byCategoryTitle')}
+          </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-table-header border-b border-border/50">
               <tr>
                 <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Category
+                  {t('dashboard.table.category')}
                 </th>
                 <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Count
+                  {t('dashboard.table.count')}
                 </th>
                 <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Percentage
+                  {t('dashboard.table.percentage')}
                 </th>
               </tr>
             </thead>
@@ -90,7 +101,9 @@ export function StatisticsTableView({
                 const pct = totalStudents ? Math.round((count / totalStudents) * 100) : 0;
                 return (
                   <tr key={cat} className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
-                    <td className="px-5 py-3 text-sm font-medium text-text-primary">{CATEGORY_LABELS[cat]}</td>
+                    <td className="px-5 py-3 text-sm font-medium text-text-primary">
+                      {t(CATEGORY_LABELS[cat])}
+                    </td>
                     <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{count}</td>
                     <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{pct}%</td>
                   </tr>
@@ -104,35 +117,41 @@ export function StatisticsTableView({
       {isSuperAdmin && (
         <div className="bg-card rounded-2xl border border-border/20 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-border/20">
-            <h2 className="text-sm font-semibold text-text-primary">Admins & Managers</h2>
+            <h2 className="text-sm font-semibold text-text-primary">
+              {t('dashboard.table.adminsManagersTitle')}
+            </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-table-header border-b border-border/50">
                 <tr>
                   <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    Role
+                    {t('dashboard.table.role')}
                   </th>
                   <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    Total
+                    {t('dashboard.table.total')}
                   </th>
                   <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    Active
+                    {t('dashboard.table.active')}
                   </th>
                   <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    Inactive
+                    {t('dashboard.table.inactive')}
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
-                  <td className="px-5 py-3 text-sm font-medium text-text-primary">Admins</td>
+                  <td className="px-5 py-3 text-sm font-medium text-text-primary">
+                    {t('dashboard.table.role.admins')}
+                  </td>
                   <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{totalAdmins}</td>
                   <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{activeAdmins}</td>
                   <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{inactiveAdmins}</td>
                 </tr>
                 <tr className="hover:bg-bg-beige-light/50 transition-colors">
-                  <td className="px-5 py-3 text-sm font-medium text-text-primary">Managers</td>
+                  <td className="px-5 py-3 text-sm font-medium text-text-primary">
+                    {t('dashboard.table.role.managers')}
+                  </td>
                   <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{totalManagers}</td>
                   <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{activeManagers}</td>
                   <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{inactiveManagers}</td>

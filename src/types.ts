@@ -1,8 +1,8 @@
 export const CATEGORY_LABELS = {
-  child: 'ህጻናት',
-  youth: 'ወጣት',
-  adolescent: 'አዳጊ',
-  adult: 'ሰራተኛ',
+  child: 'category.child',
+  youth: 'category.youth',
+  adolescent: 'category.adolescent',
+  adult: 'category.adult',
 } as const;
 
 export type RecordCategory = keyof typeof CATEGORY_LABELS;

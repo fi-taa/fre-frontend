@@ -23,6 +23,7 @@ import type {
   AdultDetails,
   YouthDetails,
 } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface AddRecordFormProps {
   onCancel: () => void;
@@ -35,8 +36,8 @@ const debirOptions = [
 ];
 
 const SEX_OPTIONS = [
-  { value: 'MALE', label: 'ወንድ' },
-  { value: 'FEMALE', label: 'ሴት' },
+  { value: 'MALE', labelKey: 'enum.gender.MALE' },
+  { value: 'FEMALE', labelKey: 'enum.gender.FEMALE' },
 ];
 
 const CATEGORY_DETAILS_KEYS: Record<RecordCategory, string> = {
@@ -230,6 +231,7 @@ function buildCategoryDetails(
 }
 
 export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
+  const { t } = useI18n();
   const [createStudent, { isLoading }] = useCreateStudentMutation();
   const { data: departments = [], isLoading: departmentsLoading } = useListDepartmentsQuery(undefined, { skip: false });
   const [currentSection, setCurrentSection] = useState(1);
@@ -274,14 +276,14 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
     setError('');
 
     if (!sex) {
-      setError('Sex is required');
+      setError(t('error.sexRequired'));
       setCurrentSection(1);
       return;
     }
 
     const deptId = parseInt(departmentId, 10);
     if (!departmentId || isNaN(deptId)) {
-      setError('Department is required');
+      setError(t('error.departmentRequired'));
       setCurrentSection(1);
       return;
     }
@@ -302,7 +304,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
     const nationality = formData.nationality || '';
 
     if (!name.trim()) {
-      setError('Name is required');
+      setError(t('error.nameRequired'));
       const nameSection = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'name'));
       if (nameSection !== -1) setCurrentSection(nameSection + 2);
       return;
@@ -310,21 +312,21 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
     const age = parseInt(ageStr, 10);
     if (!ageStr || isNaN(age) || age < 0) {
-      setError('Valid age is required');
+      setError(t('error.ageRequired'));
       const ageSection = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'age'));
       if (ageSection !== -1) setCurrentSection(ageSection + 2);
       return;
     }
 
     if (!dob.trim()) {
-      setError('Date of birth is required');
+      setError(t('error.dobRequired'));
       const dobSection = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'dob'));
       if (dobSection !== -1) setCurrentSection(dobSection + 2);
       return;
     }
 
     if (!currentRegion.trim() || !currentZone.trim() || !currentCity.trim() || !nationality.trim()) {
-      setError('Current region, zone, city, and nationality are required');
+      setError(t('error.addressRequired'));
       const addrSection = formConfig.sections.findIndex((s) =>
         s.fields.some((f) => f.id === 'current_region')
       );
@@ -334,7 +336,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
     if (category === 'child' || category === 'adolescent') {
       if (!formData.education_level?.trim() || !formData.education_occupation?.trim()) {
-        setError('Education level and occupation are required');
+        setError(t('error.educationRequired'));
         const section = formConfig.sections.findIndex((s) =>
           s.fields.some((f) => f.id === 'education_level')
         );
@@ -342,7 +344,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
         return;
       }
       if (!formData.health_emergency_name?.trim() || !formData.health_emergency_phone?.trim() || !formData.health_emergency_relation?.trim()) {
-        setError('Emergency contact name, phone, and relation are required');
+        setError(t('error.emergencyContactRequired'));
         const section = formConfig.sections.findIndex((s) =>
           s.fields.some((f) => f.id === 'health_emergency_name')
         );
@@ -353,13 +355,13 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
     if (category === 'youth') {
       if (!formData.phone?.trim()) {
-        setError('Phone is required');
+        setError(t('error.phoneRequired'));
         const section = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'phone'));
         if (section !== -1) setCurrentSection(section + 2);
         return;
       }
       if (!formData.education_level?.trim() || !formData.education_occupation?.trim()) {
-        setError('Education level and occupation are required');
+        setError(t('error.educationRequired'));
         const section = formConfig.sections.findIndex((s) =>
           s.fields.some((f) => f.id === 'education_level')
         );
@@ -367,7 +369,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
         return;
       }
       if (!formData.health_emergency_name?.trim() || !formData.health_emergency_phone?.trim() || !formData.health_emergency_relation?.trim()) {
-        setError('Emergency contact name, phone, and relation are required');
+        setError(t('error.emergencyContactRequired'));
         const section = formConfig.sections.findIndex((s) =>
           s.fields.some((f) => f.id === 'health_emergency_name')
         );
@@ -378,12 +380,12 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
     if (category === 'adult') {
       if (!formData.adult_marital_status?.trim() || !formData.adult_phone?.trim()) {
-        setError('Marital status and phone are required');
+        setError(t('error.maritalStatusPhoneRequired'));
         setCurrentSection(2);
         return;
       }
       if (!formData.education_level?.trim() || !formData.education_occupation?.trim()) {
-        setError('Education level and occupation are required');
+        setError(t('error.educationRequired'));
         const section = formConfig.sections.findIndex((s) =>
           s.fields.some((f) => f.id === 'education_level')
         );
@@ -391,7 +393,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
         return;
       }
       if (!formData.health_emergency_name?.trim() || !formData.health_emergency_phone?.trim() || !formData.health_emergency_relation?.trim()) {
-        setError('Emergency contact name, phone, and relation are required');
+        setError(t('error.emergencyContactRequired'));
         const section = formConfig.sections.findIndex((s) =>
           s.fields.some((f) => f.id === 'health_emergency_name')
         );
@@ -429,7 +431,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
       onSuccess();
     } catch (err) {
       const errObj = err as { data?: { detail?: string | { msg?: string }[] }; status?: number };
-      let msg = 'Failed to create record';
+      let msg = t('error.createRecordFailed');
       if (errObj?.data?.detail) {
         const d = errObj.data.detail;
         msg = Array.isArray(d) ? d.map((x) => x?.msg || String(x)).join(', ') : String(d);
@@ -443,16 +445,16 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
       <div className="space-y-4">
         <div>
           <label htmlFor="category" className="block text-sm font-medium mb-2 text-text-primary">
-            ክፍል <span className="text-error">*</span>
+            {t('ክፍል')} <span className="text-error">*</span>
           </label>
           <Select value={category} onValueChange={(v) => handleCategoryChange(v as RecordCategory)} required>
             <SelectTrigger id="category">
-              <SelectValue placeholder="Select category" />
+              <SelectValue placeholder={t('Select category')} />
             </SelectTrigger>
             <SelectContent>
               {RECORD_CATEGORIES.map((cat) => (
                 <SelectItem key={cat} value={cat}>
-                  {CATEGORY_LABELS[cat]}
+                  {t(CATEGORY_LABELS[cat])}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -461,16 +463,16 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
         <div>
           <label htmlFor="sex" className="block text-sm font-medium mb-2 text-text-primary">
-            ጾታ <span className="text-error">*</span>
+            {t('ጾታ')} <span className="text-error">*</span>
           </label>
           <Select value={sex} onValueChange={setSex} required>
             <SelectTrigger id="sex">
-              <SelectValue placeholder="Choose" />
+              <SelectValue placeholder={t('Choose')} />
             </SelectTrigger>
             <SelectContent>
               {SEX_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(opt.labelKey)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -479,12 +481,12 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
         <div>
           <label htmlFor="department" className="block text-sm font-medium mb-2 text-text-primary">
-            ክፍል / Department <span className="text-error">*</span>
+            {t('ክፍል / Department')} <span className="text-error">*</span>
           </label>
           {departmentsLoading ? (
-            <div className="min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light flex items-center text-text-secondary text-sm">
-              Loading departments...
-            </div>
+              <div className="min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light flex items-center text-text-secondary text-sm">
+                {t('Loading departments...')}
+              </div>
           ) : departments.length === 0 ? (
             <input
               id="department"
@@ -492,7 +494,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
               min={1}
               value={departmentId}
               onChange={(e) => setDepartmentId(e.target.value)}
-              placeholder="Enter department ID"
+              placeholder={t('Enter department ID')}
               required
               className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
             />
@@ -504,7 +506,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
               required
               className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
             >
-              <option value="">Choose department</option>
+              <option value="">{t('Choose department')}</option>
               {departments.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
@@ -516,11 +518,11 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
         <div>
           <label htmlFor="debir" className="block text-sm font-medium mb-2 text-text-primary">
-            በቋሚነት መርኃግብር የሚሳተፉበት ደብር
+            {t('በቋሚነት መርኃግብር የሚሳተፉበት ደብር')}
           </label>
           <Select value={debir} onValueChange={setDebir}>
             <SelectTrigger id="debir">
-              <SelectValue placeholder="Choose" />
+              <SelectValue placeholder={t('Choose')} />
             </SelectTrigger>
             <SelectContent>
               {debirOptions.map((opt) => (
@@ -563,7 +565,7 @@ function renderDynamicSection(sectionIndex: number) {
                       onClick={() => setShowMoreAddress(true)}
                       className="text-xs font-medium text-link hover:underline"
                     >
-                      More address details
+                      {t('More address details')}
                     </button>
                   </div>
                 );
@@ -577,11 +579,11 @@ function renderDynamicSection(sectionIndex: number) {
                       onClick={() => setShowMoreAddress(false)}
                       className="text-xs font-medium text-link hover:underline"
                     >
-                      Hide additional address details
+                      {t('Hide additional address details')}
                     </button>
                   </div>
                   <label htmlFor={field.id} className="block text-sm font-medium mb-2 text-text-primary">
-                    {field.label}
+                    {t(field.label)}
                     {field.required && <span className="text-error"> *</span>}
                   </label>
                   {field.type === 'checkbox' ? (
@@ -604,14 +606,24 @@ function renderDynamicSection(sectionIndex: number) {
                   ) : field.type === 'select' ? (
                     <Select value={formData[field.id] || ''} onValueChange={(v) => updateField(field.id, v)} required={field.required}>
                       <SelectTrigger id={field.id}>
-                        <SelectValue placeholder="Choose" />
+                        <SelectValue placeholder={t('Choose')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {field.options?.map((opt) => (
-                          <SelectItem key={opt} value={opt}>
-                            {opt}
-                          </SelectItem>
-                        ))}
+                        {field.options?.map((opt) => {
+                          let labelKey = opt;
+                          if (field.id === 'adult_marital_status') {
+                            labelKey = `enum.maritalStatus.${opt}`;
+                          } else if (field.id === 'education_level') {
+                            labelKey = `enum.education.level.${opt}`;
+                          } else if (field.id === 'education_occupation') {
+                            labelKey = `enum.education.occupation.${opt}`;
+                          }
+                          return (
+                            <SelectItem key={opt} value={opt}>
+                              {t(labelKey)}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   ) : field.type === 'textarea' ? (
@@ -620,7 +632,7 @@ function renderDynamicSection(sectionIndex: number) {
                       value={formData[field.id] || ''}
                       onChange={(e) => updateField(field.id, e.target.value)}
                       className="w-full min-h-[100px] px-4 py-3 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200 resize-none"
-                      placeholder={field.placeholder}
+                      placeholder={field.placeholder ? t(field.placeholder) : undefined}
                       required={field.required}
                     />
                   ) : (
@@ -630,7 +642,7 @@ function renderDynamicSection(sectionIndex: number) {
                       value={formData[field.id] || ''}
                       onChange={(e) => updateField(field.id, e.target.value)}
                       className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
-                      placeholder={field.placeholder}
+                      placeholder={field.placeholder ? t(field.placeholder) : undefined}
                       required={field.required}
                     />
                   )}
@@ -644,7 +656,7 @@ function renderDynamicSection(sectionIndex: number) {
           return (
             <div key={field.id}>
               <label htmlFor={field.id} className="block text-sm font-medium mb-2 text-text-primary">
-                {field.label}
+                {t(field.label)}
                 {field.required && <span className="text-error"> *</span>}
               </label>
               {field.type === 'checkbox' ? (
@@ -667,14 +679,24 @@ function renderDynamicSection(sectionIndex: number) {
               ) : field.type === 'select' ? (
                 <Select value={formData[field.id] || ''} onValueChange={(v) => updateField(field.id, v)} required={field.required}>
                   <SelectTrigger id={field.id}>
-                    <SelectValue placeholder="Choose" />
+                    <SelectValue placeholder={t('Choose')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {field.options?.map((opt) => (
-                      <SelectItem key={opt} value={opt}>
-                        {opt}
-                      </SelectItem>
-                    ))}
+                    {field.options?.map((opt) => {
+                      let labelKey = opt;
+                      if (field.id === 'adult_marital_status') {
+                        labelKey = `enum.maritalStatus.${opt}`;
+                      } else if (field.id === 'education_level') {
+                        labelKey = `enum.education.level.${opt}`;
+                      } else if (field.id === 'education_occupation') {
+                        labelKey = `enum.education.occupation.${opt}`;
+                      }
+                      return (
+                        <SelectItem key={opt} value={opt}>
+                          {t(labelKey)}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               ) : field.type === 'textarea' ? (
@@ -683,7 +705,7 @@ function renderDynamicSection(sectionIndex: number) {
                   value={formData[field.id] || ''}
                   onChange={(e) => updateField(field.id, e.target.value)}
                   className="w-full min-h-[100px] px-4 py-3 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200 resize-none"
-                  placeholder={field.placeholder}
+                  placeholder={field.placeholder ? t(field.placeholder) : undefined}
                   required={field.required}
                 />
               ) : (
@@ -693,7 +715,7 @@ function renderDynamicSection(sectionIndex: number) {
                   value={formData[field.id] || ''}
                   onChange={(e) => updateField(field.id, e.target.value)}
                   className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
-                  placeholder={field.placeholder}
+                  placeholder={field.placeholder ? t(field.placeholder) : undefined}
                   required={field.required}
                 />
               )}
@@ -711,14 +733,14 @@ function renderDynamicSection(sectionIndex: number) {
           <button
             onClick={onCancel}
             className="p-2 -ml-2 rounded-lg hover:bg-bg-beige-light transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/20"
-            aria-label="Back"
+            aria-label={t('Back')}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-primary">
               <path d="m12 19-7-7 7-7" />
               <path d="M19 12H5" />
             </svg>
           </button>
-          <h1 className="text-xl font-bold text-text-primary">Add New Record</h1>
+          <h1 className="text-xl font-bold text-text-primary">{t('Add New Record')}</h1>
           <div className="w-10" />
         </div>
       </div>
@@ -745,7 +767,7 @@ function renderDynamicSection(sectionIndex: number) {
             </div>
             <div className="text-center mt-4">
               <span className="text-sm font-medium text-text-secondary">
-                Section {currentSection} of {totalSections}
+                {t('Section')} {currentSection} {t('of')} {totalSections}
               </span>
             </div>
           </div>
@@ -758,10 +780,18 @@ function renderDynamicSection(sectionIndex: number) {
             <form onSubmit={handleSubmit} className="relative z-10 p-6">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-text-primary mb-1">
-                  {currentSection === 1 ? 'Category & Details' : formConfig.sections[currentSection - 2]?.title || `Section ${currentSection}`}
+                  {currentSection === 1
+                    ? t('Category & Details')
+                    : formConfig.sections[currentSection - 2]?.title
+                      ? t(formConfig.sections[currentSection - 2].title)
+                      : `${t('Section')} ${currentSection}`}
                 </h2>
                 <p className="text-sm text-text-secondary">
-                  {currentSection === 1 ? 'Select category, sex, and department' : formConfig.sections[currentSection - 2]?.description || 'Please fill in all the fields in this section'}
+                  {currentSection === 1
+                    ? t('Select category, sex, and department')
+                    : formConfig.sections[currentSection - 2]?.description
+                      ? t(formConfig.sections[currentSection - 2].description as string)
+                      : t('Please fill in all the fields in this section')}
                 </p>
               </div>
 
@@ -776,7 +806,7 @@ function renderDynamicSection(sectionIndex: number) {
                     onClick={handlePrevious}
                     className="flex-1 min-h-[44px] px-4 rounded-lg border border-border/50 text-text-primary hover:bg-bg-beige-light transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-link/20 font-medium"
                   >
-                    Previous
+                    {t('Previous')}
                   </button>
                 )}
                 {currentSection < totalSections ? (
@@ -785,7 +815,7 @@ function renderDynamicSection(sectionIndex: number) {
                     onClick={handleNext}
                     className="flex-1 min-h-[44px] px-4 rounded-lg bg-accent text-text-light hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 font-medium"
                   >
-                    Next
+                    {t('Next')}
                   </button>
                 ) : (
                   <button
@@ -793,7 +823,7 @@ function renderDynamicSection(sectionIndex: number) {
                     disabled={isLoading}
                     className="flex-1 min-h-[44px] px-4 rounded-lg bg-accent text-text-light hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-accent/30 font-medium disabled:opacity-60"
                   >
-                    {isLoading ? 'Submitting...' : 'Submit'}
+                    {isLoading ? t('Submitting...') : t('Submit')}
                   </button>
                 )}
               </div>

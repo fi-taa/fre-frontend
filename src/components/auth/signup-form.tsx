@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signUp } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
+import { useI18n } from '@/i18n/I18nProvider';
 
 export function SignupForm() {
   const router = useRouter();
+  const { t } = useI18n();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,7 +23,7 @@ export function SignupForm() {
     setIsLoading(true);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('error.passwordsMismatch'));
       setIsLoading(false);
       return;
     }
@@ -29,7 +31,7 @@ export function SignupForm() {
     const result = signUp(username, password);
 
     if (!result.success) {
-      setError(result.error || 'Sign up failed');
+      setError(result.error || t('error.signupFailed'));
       setIsLoading(false);
       return;
     }

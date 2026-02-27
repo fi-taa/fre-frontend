@@ -14,6 +14,7 @@ import { StatisticsTableView } from '@/components/dashboard/statistics-table-vie
 import { StatisticsGraphView } from '@/components/dashboard/statistics-graph-view';
 import { handleLogout as logoutAndResetCache } from '@/lib/auth-helpers';
 import { apiCategoryToSlug, CATEGORY_LABELS } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 import type { RootState } from '@/store/store';
 import type { RecordCategory } from '@/types';
 
@@ -27,6 +28,7 @@ const CATEGORY_COLORS: Record<RecordCategory, string> = {
 export default function DashboardPage() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useI18n();
   const [mounted, setMounted] = useState(false);
   const [statisticsView, setStatisticsView] = useState<'table' | 'graph'>('graph');
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -150,8 +152,12 @@ export default function DashboardPage() {
             <div className="space-y-6 lg:space-y-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">Overview</h1>
-                  <p className="text-sm text-text-secondary mt-0.5">Summary of records</p>
+                  <h1 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight">
+                    {t('dashboard.overview')}
+                  </h1>
+                  <p className="text-sm text-text-secondary mt-0.5">
+                    {t('dashboard.overviewSubtitle')}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <StatisticsViewToggle view={statisticsView} onViewChange={setStatisticsView} />
@@ -159,13 +165,13 @@ export default function DashboardPage() {
                     href="/dashboard/records"
                     className="inline-flex min-h-[44px] items-center px-4 py-2.5 text-sm font-medium rounded-xl border border-border/50 text-text-primary bg-card hover:bg-bg-beige-light hover:border-border transition-colors focus:outline-none focus:ring-2 focus:ring-link/30"
                   >
-                    View records
+                    {t('dashboard.viewRecords')}
                   </Link>
                   <Link
                     href="/dashboard/add"
                     className="inline-flex min-h-[44px] items-center px-4 py-2.5 text-sm font-medium rounded-xl bg-accent text-text-light hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-bg-beige shadow-sm"
                   >
-                    Add record
+                    {t('dashboard.addRecord')}
                   </Link>
                 </div>
               </div>
@@ -177,7 +183,9 @@ export default function DashboardPage() {
                 >
                   <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full bg-link/5 group-hover:bg-link/10 transition-colors" />
                   <div className="relative">
-                    <p className="text-xs font-medium uppercase tracking-wider text-text-secondary">Students</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-text-secondary">
+                      {t('dashboard.card.students')}
+                    </p>
                     <p className="mt-1 text-2xl sm:text-3xl font-bold text-text-primary tabular-nums">{stats.students}</p>
                   </div>
                 </Link>
@@ -187,7 +195,9 @@ export default function DashboardPage() {
                 >
                   <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full bg-link/5 group-hover:bg-link/10 transition-colors" />
                   <div className="relative">
-                    <p className="text-xs font-medium uppercase tracking-wider text-text-secondary">Departments</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-text-secondary">
+                      {t('dashboard.card.departments')}
+                    </p>
                     <p className="mt-1 text-2xl sm:text-3xl font-bold text-text-primary tabular-nums">{stats.departments}</p>
                   </div>
                 </Link>
