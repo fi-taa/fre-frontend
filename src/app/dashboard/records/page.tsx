@@ -92,7 +92,7 @@ export default function RecordsPage() {
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
       <div className="relative z-10">
-        <DashboardHeader onLogout={handleLogout} onNotifications={handleNotifications} notificationCount={0} />
+        <DashboardHeader onLogout={onLogout} onNotifications={handleNotifications} notificationCount={0} />
         <div className="bg-card border-b border-border/30">
           <div className="px-4 py-3 border-b border-border/20">
             <Link href="/dashboard" className="flex min-h-[44px] items-center gap-2 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors w-fit">

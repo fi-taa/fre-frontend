@@ -71,7 +71,7 @@ export default function ProfilePage() {
       />
       <div className="relative z-10">
         <DashboardHeader
-          onLogout={handleLogout}
+          onLogout={onLogout}
           onNotifications={handleNotifications}
           notificationCount={0}
         />

@@ -102,6 +102,16 @@ export default function ManagersPage() {
   const isLoading = (isSuperAdmin ? allUsersLoading : managersLoading) || !currentUser;
   const canAddManager = currentUser?.role === 'admin' || currentUser?.role === 'super_admin';
 
+  const activeError = isSuperAdmin ? allUsersError : managersError;
+  const errorMessage =
+    activeError && typeof activeError === 'object'
+      ? (() => {
+          const detailed = activeError as { data?: { detail?: string } } | undefined;
+          const detail = detailed?.data?.detail;
+          return detail ? String(detail) : 'Access denied';
+        })()
+      : 'Access denied';
+
   return (
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
@@ -163,14 +173,10 @@ export default function ManagersPage() {
           <div className="bg-card rounded-lg border border-border/30 overflow-hidden">
             {isLoading ? (
               <PageLoader className="p-8" />
-            ) : (isSuperAdmin ? allUsersError : managersError) ? (
+            ) : activeError ? (
               <div className="p-8 text-center">
                 <p className="text-text-secondary mb-2">Unable to load managers.</p>
-                <p className="text-sm text-text-muted">
-                  {(isSuperAdmin ? allUsersError : managersError) && typeof (isSuperAdmin ? allUsersError : managersError) === 'object' && 'data' in (isSuperAdmin ? allUsersError : managersError)
-                    ? String((isSuperAdmin ? allUsersError : managersError as { data?: { detail?: string } }).data?.detail || 'Access denied')
-                    : 'Access denied'}
-                </p>
+                <p className="text-sm text-text-muted">{errorMessage}</p>
               </div>
             ) : (
               <UsersTable users={filteredManagers} userType="manager" isLoading={isLoading} />

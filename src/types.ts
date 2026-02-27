@@ -81,47 +81,93 @@ export interface DepartmentUpdate {
   description?: string;
 }
 
+export interface ChildFamily {
+  father_alive: boolean;
+  father_name: string | null;
+  father_phone: string | null;
+  father_occupation: string | null;
+  father_dob: string | null;
+  father_pob: string | null;
+  father_education_level: string | null;
+  father_disability: string | null;
+  mother_alive: boolean;
+  mother_name: string | null;
+  mother_phone: string | null;
+  mother_occupation: string | null;
+  mother_dob: string | null;
+  mother_pob: string | null;
+  mother_education_level: string | null;
+  mother_disability: string | null;
+  guardian_name: string | null;
+  guardian_relation: string | null;
+  guardian_phone: string | null;
+  parents_church_freq: string | null;
+  parents_have_spiritual_father: boolean;
+  parents_spiritual_visit_freq: string | null;
+  family_members_living_together: string | null;
+  orthodox_awareness_level: string | null;
+}
+
+export interface ChildEducation {
+  level: string;
+  occupation: string;
+  college_name: string | null;
+  department_name: string | null;
+  entry_year: string | null;
+  certificate_type: string | null;
+  languages: Record<string, unknown>[];
+}
+
+export interface ChildSpirituality {
+  baptism_name: string | null;
+  baptism_place: string | null;
+  has_spiritual_father: boolean;
+  spiritual_father_name: string | null;
+  spiritual_father_phone: string | null;
+  has_holy_orders: boolean;
+}
+
+export interface ChildHealth {
+  has_disability: boolean;
+  disability_details: string | null;
+  has_trauma: boolean;
+  trauma_details: string | null;
+  health_issues: string | null;
+  mental_status: string | null;
+  emergency_name: string;
+  emergency_phone: string;
+  emergency_relation: string;
+}
+
 export interface ChildDetails {
-  photo_url?: string | null;
-  category: string;
-  parentName: string;
-  parentPhone: string;
-  grade?: string | null;
-  schoolName?: string | null;
+  family: ChildFamily;
+  education: ChildEducation | null;
+  spirituality: ChildSpirituality | null;
+  health: ChildHealth | null;
 }
 
 export interface AdultDetails {
-  photo_url?: string | null;
-  category: string;
-  phone?: string | null;
-  email?: string | null;
-  maritalStatus?: string | null;
-  occupation?: string | null;
-  education?: string | null;
+  marital_status: string;
+  phone: string;
+  email: string | null;
+  education: ChildEducation;
+  spirituality: ChildSpirituality;
+  health: ChildHealth | null;
 }
 
 export interface YouthDetails {
-  photo_url?: string | null;
-  category: string;
-  phone?: string | null;
-  email?: string | null;
-  education?: string | null;
-  occupation?: string | null;
+  phone: string;
+  education: ChildEducation;
+  family: ChildFamily | null;
+  spirituality: ChildSpirituality;
+  health: ChildHealth | null;
 }
 
-export interface AdolescentDetails {
-  photo_url?: string | null;
-  category: string;
-  parentName: string;
-  parentPhone: string;
-  grade?: string | null;
-  schoolName?: string | null;
-  phone?: string | null;
-}
+export type AdolescentDetails = ChildDetails;
 
 export type CategoryDetails = ChildDetails | AdultDetails | YouthDetails | AdolescentDetails | null;
 
-export type CategoryDetailsPayload = Record<string, Record<string, string | null>>;
+export type CategoryDetailsPayload = Record<string, unknown>;
 
 export interface Student {
   id: number;

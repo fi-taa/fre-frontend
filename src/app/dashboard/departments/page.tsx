@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
@@ -31,16 +31,16 @@ export default function DepartmentsPage() {
   const isManager = currentUser?.role === 'manager';
   const adminDepartmentIds = currentUser?.department_ids || [];
   const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
-
+  
   const departments = useMemo(() => {
     if (isSuperAdmin) {
       return allDepartments;
     }
     if (isAdmin && adminDepartmentIds.length > 0) {
-      return allDepartments.filter((dept) => adminDepartmentIds.includes(dept.id));
+      return allDepartments.filter((dept: Department) => adminDepartmentIds.includes(dept.id));
     }
     if (isManager && managerDepartmentIds.length > 0) {
-      return allDepartments.filter((dept) => managerDepartmentIds.includes(dept.id));
+      return allDepartments.filter((dept: Department) => managerDepartmentIds.includes(dept.id));
     }
     return [];
   }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);

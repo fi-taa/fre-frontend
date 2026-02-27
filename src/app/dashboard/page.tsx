@@ -34,7 +34,9 @@ export default function DashboardPage() {
 
   const { data: students = [], isLoading: studentsLoading } = useListStudentsQuery();
   const { data: departments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
-  const { data: sessions = [], isLoading: sessionsLoading } = useListAttendanceSessionsQuery();
+  const { data: sessions = [], isLoading: sessionsLoading } = useListAttendanceSessionsQuery({
+    include_inactive: false,
+  });
   const { data: currentUserData } = useGetCurrentUserQuery();
   const currentUser = currentUserData?.data;
   const isSuperAdmin = currentUser?.role === 'super_admin';

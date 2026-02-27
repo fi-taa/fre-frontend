@@ -14,7 +14,15 @@ interface RecordDetailsProps {
 export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps) {
   const formConfig = getFormConfigByCategory(record.category);
 
-  function renderFieldValue(fieldId: string, value: string | number | undefined) {
+  function renderFieldValue(
+    _fieldId: string,
+    value: string | number | undefined,
+    fieldType?: string
+  ) {
+    if (fieldType === 'checkbox') {
+      const checked = value === 'true' || value === '1';
+      return <span className="text-xs text-text-primary">{checked ? 'Yes' : 'No'}</span>;
+    }
     if (value === undefined || value === null || value === '') {
       return <span className="text-xs text-text-muted italic">Not provided</span>;
     }
@@ -74,7 +82,12 @@ export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                 {section.fields.map((field) => {
                   const value = record[field.id as keyof PersonRecord];
-                  if (value === undefined || value === null || value === '') {
+                  const isEmpty =
+                    value === undefined ||
+                    value === null ||
+                    value === '' ||
+                    (field.type === 'checkbox' && value !== 'true' && value !== '1');
+                  if (isEmpty && field.type !== 'checkbox') {
                     return null;
                   }
                   return (
@@ -84,9 +97,11 @@ export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps
                       </label>
                       <div className="text-xs text-text-primary wrap-break-word">
                         {field.type === 'textarea' ? (
-                          <div className="whitespace-pre-wrap line-clamp-3 sm:line-clamp-none">{String(value)}</div>
+                          <div className="whitespace-pre-wrap line-clamp-3 sm:line-clamp-none">
+                            {value != null && value !== '' ? String(value) : '—'}
+                          </div>
                         ) : (
-                          renderFieldValue(field.id, value)
+                          renderFieldValue(field.id, value, field.type)
                         )}
                       </div>
                     </div>

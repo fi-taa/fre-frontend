@@ -31,8 +31,10 @@ export function AttendanceHistory({ recordId, attendanceHref }: AttendanceHistor
   const record = student ? studentToRecordView(student) : undefined;
   const categoryApi = record ? CATEGORY_API_VALUES[record.category] : '';
 
+  const shouldFetchSessions = Boolean(categoryApi);
   const { data: sessions = [] } = useListAttendanceSessionsQuery(
-    categoryApi ? { category: categoryApi } : undefined
+    { category: categoryApi, include_inactive: false },
+    { skip: !shouldFetchSessions }
   );
 
   const historyRecords = useMemo((): SessionRecordView[] => {

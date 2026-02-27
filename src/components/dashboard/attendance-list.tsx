@@ -28,7 +28,9 @@ export function AttendanceList(_props: AttendanceListProps) {
   const [expandedSessionId, setExpandedSessionId] = useState<number | null>(null);
 
   const listParams = useMemo(() => {
-    const params: { program_id?: number; department_id?: number; category?: string; include_inactive?: boolean } = {};
+    const params: { program_id?: number; department_id?: number; category?: string; include_inactive?: boolean } = {
+      include_inactive: false,
+    };
     const prog = programFilter ? parseInt(programFilter, 10) : undefined;
     const dept = departmentFilter ? parseInt(departmentFilter, 10) : undefined;
     if (prog && !isNaN(prog)) params.program_id = prog;
@@ -38,7 +40,7 @@ export function AttendanceList(_props: AttendanceListProps) {
   }, [programFilter, departmentFilter, categoryFilter]);
 
   const { data: sessions = [], isLoading: sessionsLoading } = useListAttendanceSessionsQuery(
-    Object.keys(listParams).length > 0 ? listParams : undefined
+    listParams
   );
 
   const filteredSessions = useMemo(() => {

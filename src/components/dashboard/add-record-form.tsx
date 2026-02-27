@@ -12,7 +12,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RECORD_CATEGORIES, CATEGORY_LABELS, CATEGORY_API_VALUES } from '@/types';
-import type { RecordCategory, StudentCreate } from '@/types';
+import type {
+  RecordCategory,
+  StudentCreate,
+  ChildDetails,
+  ChildFamily,
+  ChildEducation,
+  ChildSpirituality,
+  ChildHealth,
+  AdultDetails,
+  YouthDetails,
+} from '@/types';
 
 interface AddRecordFormProps {
   onCancel: () => void;
@@ -36,60 +46,184 @@ const CATEGORY_DETAILS_KEYS: Record<RecordCategory, string> = {
   adult: 'Adult',
 };
 
+function toBool(v: string): boolean {
+  return v === 'true' || v === 'on' || v === '1';
+}
+
+function toStr(v: string | undefined): string | null {
+  const s = v?.trim();
+  return s === '' || s == null ? null : s;
+}
+
+function buildChildDetails(formData: Record<string, string>): ChildDetails {
+  const family: ChildFamily = {
+    father_alive: toBool(formData.family_father_alive),
+    father_name: toStr(formData.family_father_name),
+    father_phone: toStr(formData.family_father_phone),
+    father_occupation: toStr(formData.family_father_occupation),
+    father_dob: toStr(formData.family_father_dob),
+    father_pob: toStr(formData.family_father_pob),
+    father_education_level: toStr(formData.family_father_education_level),
+    father_disability: toStr(formData.family_father_disability),
+    mother_alive: toBool(formData.family_mother_alive),
+    mother_name: toStr(formData.family_mother_name),
+    mother_phone: toStr(formData.family_mother_phone),
+    mother_occupation: toStr(formData.family_mother_occupation),
+    mother_dob: toStr(formData.family_mother_dob),
+    mother_pob: toStr(formData.family_mother_pob),
+    mother_education_level: toStr(formData.family_mother_education_level),
+    mother_disability: toStr(formData.family_mother_disability),
+    guardian_name: toStr(formData.family_guardian_name),
+    guardian_relation: toStr(formData.family_guardian_relation),
+    guardian_phone: toStr(formData.family_guardian_phone),
+    parents_church_freq: toStr(formData.family_parents_church_freq),
+    parents_have_spiritual_father: toBool(formData.family_parents_have_spiritual_father),
+    parents_spiritual_visit_freq: toStr(formData.family_parents_spiritual_visit_freq),
+    family_members_living_together: toStr(formData.family_family_members_living_together),
+    orthodox_awareness_level: toStr(formData.family_orthodox_awareness_level),
+  };
+  const education: ChildEducation = {
+    level: formData.education_level?.trim() ?? '',
+    occupation: formData.education_occupation?.trim() ?? '',
+    college_name: toStr(formData.education_college_name),
+    department_name: toStr(formData.education_department_name),
+    entry_year: toStr(formData.education_entry_year),
+    certificate_type: toStr(formData.education_certificate_type),
+    languages: [],
+  };
+  const spirituality: ChildSpirituality = {
+    baptism_name: toStr(formData.spirituality_baptism_name),
+    baptism_place: toStr(formData.spirituality_baptism_place),
+    has_spiritual_father: toBool(formData.spirituality_has_spiritual_father),
+    spiritual_father_name: toStr(formData.spirituality_spiritual_father_name),
+    spiritual_father_phone: toStr(formData.spirituality_spiritual_father_phone),
+    has_holy_orders: toBool(formData.spirituality_has_holy_orders),
+  };
+  const health: ChildHealth = {
+    has_disability: toBool(formData.health_has_disability),
+    disability_details: toStr(formData.health_disability_details),
+    has_trauma: toBool(formData.health_has_trauma),
+    trauma_details: toStr(formData.health_trauma_details),
+    health_issues: toStr(formData.health_health_issues),
+    mental_status: toStr(formData.health_mental_status),
+    emergency_name: formData.health_emergency_name?.trim() ?? '',
+    emergency_phone: formData.health_emergency_phone?.trim() ?? '',
+    emergency_relation: formData.health_emergency_relation?.trim() ?? '',
+  };
+  return {
+    family,
+    education,
+    spirituality,
+    health,
+  };
+}
+
+function buildEducation(formData: Record<string, string>): ChildEducation {
+  return {
+    level: formData.education_level?.trim() ?? '',
+    occupation: formData.education_occupation?.trim() ?? '',
+    college_name: toStr(formData.education_college_name),
+    department_name: toStr(formData.education_department_name),
+    entry_year: toStr(formData.education_entry_year),
+    certificate_type: toStr(formData.education_certificate_type),
+    languages: [],
+  };
+}
+
+function buildSpirituality(formData: Record<string, string>): ChildSpirituality {
+  return {
+    baptism_name: toStr(formData.spirituality_baptism_name),
+    baptism_place: toStr(formData.spirituality_baptism_place),
+    has_spiritual_father: toBool(formData.spirituality_has_spiritual_father),
+    spiritual_father_name: toStr(formData.spirituality_spiritual_father_name),
+    spiritual_father_phone: toStr(formData.spirituality_spiritual_father_phone),
+    has_holy_orders: toBool(formData.spirituality_has_holy_orders),
+  };
+}
+
+function buildHealth(formData: Record<string, string>): ChildHealth {
+  return {
+    has_disability: toBool(formData.health_has_disability),
+    disability_details: toStr(formData.health_disability_details),
+    has_trauma: toBool(formData.health_has_trauma),
+    trauma_details: toStr(formData.health_trauma_details),
+    health_issues: toStr(formData.health_health_issues),
+    mental_status: toStr(formData.health_mental_status),
+    emergency_name: formData.health_emergency_name?.trim() ?? '',
+    emergency_phone: formData.health_emergency_phone?.trim() ?? '',
+    emergency_relation: formData.health_emergency_relation?.trim() ?? '',
+  };
+}
+
+function buildAdultDetails(formData: Record<string, string>): AdultDetails {
+  return {
+    marital_status: formData.adult_marital_status?.trim() ?? '',
+    phone: formData.adult_phone?.trim() ?? '',
+    email: toStr(formData.adult_email),
+    education: buildEducation(formData),
+    spirituality: buildSpirituality(formData),
+    health: buildHealth(formData),
+  };
+}
+
+function buildYouthDetails(formData: Record<string, string>): YouthDetails {
+  const hasFamily =
+    formData.family_father_name ||
+    formData.family_mother_name ||
+    formData.family_guardian_name;
+  let family: ChildFamily | null = null;
+  if (hasFamily) {
+    family = {
+      father_alive: toBool(formData.family_father_alive),
+      father_name: toStr(formData.family_father_name),
+      father_phone: toStr(formData.family_father_phone),
+      father_occupation: toStr(formData.family_father_occupation),
+      father_dob: toStr(formData.family_father_dob),
+      father_pob: toStr(formData.family_father_pob),
+      father_education_level: toStr(formData.family_father_education_level),
+      father_disability: toStr(formData.family_father_disability),
+      mother_alive: toBool(formData.family_mother_alive),
+      mother_name: toStr(formData.family_mother_name),
+      mother_phone: toStr(formData.family_mother_phone),
+      mother_occupation: toStr(formData.family_mother_occupation),
+      mother_dob: toStr(formData.family_mother_dob),
+      mother_pob: toStr(formData.family_mother_pob),
+      mother_education_level: toStr(formData.family_mother_education_level),
+      mother_disability: toStr(formData.family_mother_disability),
+      guardian_name: toStr(formData.family_guardian_name),
+      guardian_relation: toStr(formData.family_guardian_relation),
+      guardian_phone: toStr(formData.family_guardian_phone),
+      parents_church_freq: toStr(formData.family_parents_church_freq),
+      parents_have_spiritual_father: toBool(formData.family_parents_have_spiritual_father),
+      parents_spiritual_visit_freq: toStr(formData.family_parents_spiritual_visit_freq),
+      family_members_living_together: toStr(formData.family_family_members_living_together),
+      orthodox_awareness_level: toStr(formData.family_orthodox_awareness_level),
+    };
+  }
+  return {
+    phone: formData.phone?.trim() ?? '',
+    education: buildEducation(formData),
+    family,
+    spirituality: buildSpirituality(formData),
+    health: buildHealth(formData),
+  };
+}
+
 function buildCategoryDetails(
   category: RecordCategory,
   formData: Record<string, string>
-): Record<string, Record<string, string | null>> {
-  const apiCategory = CATEGORY_API_VALUES[category];
+): Record<string, unknown> {
   const nestedKey = CATEGORY_DETAILS_KEYS[category];
 
   switch (category) {
     case 'child':
-      return {
-        [nestedKey]: {
-          photo_url: null,
-          category: apiCategory,
-          parentName: formData.parentName || '',
-          parentPhone: formData.parentPhone || '',
-          grade: formData.grade || null,
-          schoolName: formData.schoolName || null,
-        },
-      };
+      return { [nestedKey]: buildChildDetails(formData) };
     case 'youth':
-      return {
-        [nestedKey]: {
-          photo_url: null,
-          category: apiCategory,
-          phone: formData.phone || null,
-          email: formData.email || null,
-          education: formData.education || null,
-          occupation: formData.occupation || null,
-        },
-      };
+      return { [nestedKey]: buildYouthDetails(formData) };
     case 'adolescent':
-      return {
-        [nestedKey]: {
-          photo_url: null,
-          category: apiCategory,
-          parentName: formData.parentName || '',
-          parentPhone: formData.parentPhone || '',
-          grade: formData.grade || null,
-          schoolName: formData.schoolName || null,
-          phone: formData.phone || null,
-        },
-      };
+      return { [nestedKey]: buildChildDetails(formData) };
     case 'adult':
-      return {
-        [nestedKey]: {
-          photo_url: null,
-          category: apiCategory,
-          phone: formData.phone || null,
-          email: formData.email || null,
-          maritalStatus: formData.maritalStatus || null,
-          occupation: formData.occupation || null,
-          education: formData.education || null,
-        },
-      };
+      return { [nestedKey]: buildAdultDetails(formData) };
     default:
       return {};
   }
@@ -168,13 +302,72 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
       return;
     }
 
-    if ((category === 'child' || category === 'adolescent') && (!formData.parentName?.trim() || !formData.parentPhone?.trim())) {
-      setError('Parent name and phone are required');
-      const parentSection = formConfig.sections.findIndex((s) =>
-        s.fields.some((f) => f.id === 'parentName')
-      );
-      if (parentSection !== -1) setCurrentSection(parentSection + 2);
-      return;
+    if (category === 'child' || category === 'adolescent') {
+      if (!formData.education_level?.trim() || !formData.education_occupation?.trim()) {
+        setError('Education level and occupation are required');
+        const section = formConfig.sections.findIndex((s) =>
+          s.fields.some((f) => f.id === 'education_level')
+        );
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
+      if (!formData.health_emergency_name?.trim() || !formData.health_emergency_phone?.trim() || !formData.health_emergency_relation?.trim()) {
+        setError('Emergency contact name, phone, and relation are required');
+        const section = formConfig.sections.findIndex((s) =>
+          s.fields.some((f) => f.id === 'health_emergency_name')
+        );
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
+    }
+
+    if (category === 'youth') {
+      if (!formData.phone?.trim()) {
+        setError('Phone is required');
+        const section = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'phone'));
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
+      if (!formData.education_level?.trim() || !formData.education_occupation?.trim()) {
+        setError('Education level and occupation are required');
+        const section = formConfig.sections.findIndex((s) =>
+          s.fields.some((f) => f.id === 'education_level')
+        );
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
+      if (!formData.health_emergency_name?.trim() || !formData.health_emergency_phone?.trim() || !formData.health_emergency_relation?.trim()) {
+        setError('Emergency contact name, phone, and relation are required');
+        const section = formConfig.sections.findIndex((s) =>
+          s.fields.some((f) => f.id === 'health_emergency_name')
+        );
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
+    }
+
+    if (category === 'adult') {
+      if (!formData.adult_marital_status?.trim() || !formData.adult_phone?.trim()) {
+        setError('Marital status and phone are required');
+        setCurrentSection(2);
+        return;
+      }
+      if (!formData.education_level?.trim() || !formData.education_occupation?.trim()) {
+        setError('Education level and occupation are required');
+        const section = formConfig.sections.findIndex((s) =>
+          s.fields.some((f) => f.id === 'education_level')
+        );
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
+      if (!formData.health_emergency_name?.trim() || !formData.health_emergency_phone?.trim() || !formData.health_emergency_relation?.trim()) {
+        setError('Emergency contact name, phone, and relation are required');
+        const section = formConfig.sections.findIndex((s) =>
+          s.fields.some((f) => f.id === 'health_emergency_name')
+        );
+        if (section !== -1) setCurrentSection(section + 2);
+        return;
+      }
     }
 
     const payload: StudentCreate = {
@@ -308,7 +501,15 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
               {field.label}
               {field.required && <span className="text-error"> *</span>}
             </label>
-            {field.type === 'select' ? (
+            {field.type === 'checkbox' ? (
+              <input
+                id={field.id}
+                type="checkbox"
+                checked={formData[field.id] === 'true'}
+                onChange={(e) => updateField(field.id, e.target.checked ? 'true' : 'false')}
+                className="h-4 w-4 rounded border-border/50 text-accent focus:ring-link/30"
+              />
+            ) : field.type === 'select' ? (
               <Select value={formData[field.id] || ''} onValueChange={(v) => updateField(field.id, v)} required={field.required}>
                 <SelectTrigger id={field.id}>
                   <SelectValue placeholder="Choose" />
