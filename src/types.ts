@@ -183,17 +183,36 @@ export interface Student {
   updated_at?: string;
 }
 
+export interface StudentAddress {
+  birth_region?: string | null;
+  birth_zone?: string | null;
+  birth_city?: string | null;
+  birth_woreda?: string | null;
+  birth_kebele?: string | null;
+  current_region: string;
+  current_zone: string;
+  current_city: string;
+  current_woreda?: string | null;
+  current_kebele?: string | null;
+  nationality: string;
+}
+
 export interface StudentCreate {
-  name: string;
-  age: number;
-  sex: string;
-  church?: string | null;
+  full_name: string;
+  gender: 'MALE' | 'FEMALE';
+  dob: string;
+  photo_url?: string | null;
   department_id: number;
   category: string;
+  address: StudentAddress;
   category_details: CategoryDetailsPayload;
 }
 
 export interface StudentUpdate {
+  full_name?: string;
+  gender?: 'MALE' | 'FEMALE';
+  dob?: string;
+  address?: StudentAddress;
   name?: string;
   age?: number;
   sex?: string;

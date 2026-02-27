@@ -23,6 +23,20 @@ export interface CategoryFormConfig {
 const commonFields: FieldConfig[] = [
   { id: 'name', label: 'ስም', type: 'text', required: true, placeholder: 'Enter name' },
   { id: 'age', label: 'እድሜ', type: 'number', required: true, placeholder: 'Enter age' },
+  { id: 'dob', label: 'DOB (dd/mm/yyyy)', type: 'text', required: true, placeholder: 'dd/mm/yyyy' },
+  // Required address (always visible)
+  { id: 'current_region', label: 'Current region', type: 'text', required: true, placeholder: 'Region' },
+  { id: 'current_zone', label: 'Current zone', type: 'text', required: true, placeholder: 'Zone' },
+  { id: 'current_city', label: 'Current city', type: 'text', required: true, placeholder: 'City' },
+  { id: 'nationality', label: 'Nationality', type: 'text', required: true, placeholder: 'Nationality' },
+  // Optional address (behind “More address details”)
+  { id: 'birth_region', label: 'Birth region', type: 'text', placeholder: 'Optional' },
+  { id: 'birth_zone', label: 'Birth zone', type: 'text', placeholder: 'Optional' },
+  { id: 'birth_city', label: 'Birth city', type: 'text', placeholder: 'Optional' },
+  { id: 'birth_woreda', label: 'Birth woreda', type: 'text', placeholder: 'Optional' },
+  { id: 'birth_kebele', label: 'Birth kebele', type: 'text', placeholder: 'Optional' },
+  { id: 'current_woreda', label: 'Current woreda', type: 'text', placeholder: 'Optional' },
+  { id: 'current_kebele', label: 'Current kebele', type: 'text', placeholder: 'Optional' },
 ];
 
 export const categoryFormConfigs: CategoryFormConfig[] = [
@@ -76,8 +90,27 @@ export const categoryFormConfigs: CategoryFormConfig[] = [
         title: 'Education',
         description: 'Education details',
         fields: [
-          { id: 'education_level', label: 'Education level', type: 'text', required: true, placeholder: 'Level' },
-          { id: 'education_occupation', label: 'Occupation', type: 'text', required: true, placeholder: 'Occupation' },
+          {
+            id: 'education_level',
+            label: 'Education level',
+            type: 'select',
+            required: true,
+            options: ['ELEMENTARY', 'HIGH_SCHOOL', 'PREPARATORY', 'HIGHER_EDUCATION', 'ILLITERATE'],
+          },
+          {
+            id: 'education_occupation',
+            label: 'Occupation',
+            type: 'select',
+            required: true,
+            options: [
+              'STUDENT',
+              'EMPLOYED_CIVIL',
+              'EMPLOYED_PRIVATE',
+              'WORKER_AND_STUDENT',
+              'UNEMPLOYED',
+              'SELF_EMPLOYED',
+            ],
+          },
           { id: 'education_college_name', label: 'College name', type: 'text', placeholder: 'If applicable' },
           { id: 'education_department_name', label: 'Department name', type: 'text', placeholder: 'Department' },
           { id: 'education_entry_year', label: 'Entry year', type: 'text', placeholder: 'Year' },
@@ -128,8 +161,27 @@ export const categoryFormConfigs: CategoryFormConfig[] = [
         title: 'Education',
         description: 'Education details',
         fields: [
-          { id: 'education_level', label: 'Education level', type: 'text', required: true, placeholder: 'Level' },
-          { id: 'education_occupation', label: 'Occupation', type: 'text', required: true, placeholder: 'Occupation' },
+          {
+            id: 'education_level',
+            label: 'Education level',
+            type: 'select',
+            required: true,
+            options: ['ELEMENTARY', 'HIGH_SCHOOL', 'PREPARATORY', 'HIGHER_EDUCATION', 'ILLITERATE'],
+          },
+          {
+            id: 'education_occupation',
+            label: 'Occupation',
+            type: 'select',
+            required: true,
+            options: [
+              'STUDENT',
+              'EMPLOYED_CIVIL',
+              'EMPLOYED_PRIVATE',
+              'WORKER_AND_STUDENT',
+              'UNEMPLOYED',
+              'SELF_EMPLOYED',
+            ],
+          },
           { id: 'education_college_name', label: 'College name', type: 'text', placeholder: 'If applicable' },
           { id: 'education_department_name', label: 'Department name', type: 'text', placeholder: 'Department' },
           { id: 'education_entry_year', label: 'Entry year', type: 'text', placeholder: 'Year' },
@@ -302,7 +354,13 @@ export const categoryFormConfigs: CategoryFormConfig[] = [
         description: 'Required contact and marital status',
         fields: [
           ...commonFields,
-          { id: 'adult_marital_status', label: 'Marital status', type: 'select', required: true, options: ['Single', 'Married', 'Divorced', 'Widowed'] },
+          {
+            id: 'adult_marital_status',
+            label: 'Marital status',
+            type: 'select',
+            required: true,
+            options: ['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED', 'MONK'],
+          },
           { id: 'adult_phone', label: 'ስልክ', type: 'text', required: true, placeholder: 'Phone' },
           { id: 'adult_email', label: 'ኢሜይል', type: 'text', placeholder: 'Email' },
         ],
@@ -311,8 +369,27 @@ export const categoryFormConfigs: CategoryFormConfig[] = [
         title: 'Education',
         description: 'Education details',
         fields: [
-          { id: 'education_level', label: 'Education level', type: 'text', required: true, placeholder: 'Level' },
-          { id: 'education_occupation', label: 'Occupation', type: 'text', required: true, placeholder: 'Occupation' },
+          {
+            id: 'education_level',
+            label: 'Education level',
+            type: 'select',
+            required: true,
+            options: ['ELEMENTARY', 'HIGH_SCHOOL', 'PREPARATORY', 'HIGHER_EDUCATION', 'ILLITERATE'],
+          },
+          {
+            id: 'education_occupation',
+            label: 'Occupation',
+            type: 'select',
+            required: true,
+            options: [
+              'STUDENT',
+              'EMPLOYED_CIVIL',
+              'EMPLOYED_PRIVATE',
+              'WORKER_AND_STUDENT',
+              'UNEMPLOYED',
+              'SELF_EMPLOYED',
+            ],
+          },
           { id: 'education_college_name', label: 'College name', type: 'text', placeholder: 'If applicable' },
           { id: 'education_department_name', label: 'Department name', type: 'text', placeholder: 'Department' },
           { id: 'education_entry_year', label: 'Entry year', type: 'text', placeholder: 'Year' },

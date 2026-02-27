@@ -35,15 +35,15 @@ const debirOptions = [
 ];
 
 const SEX_OPTIONS = [
-  { value: 'male', label: 'ወንድ' },
-  { value: 'female', label: 'ሴት' },
+  { value: 'MALE', label: 'ወንድ' },
+  { value: 'FEMALE', label: 'ሴት' },
 ];
 
 const CATEGORY_DETAILS_KEYS: Record<RecordCategory, string> = {
-  child: 'Children',
-  youth: 'Youth',
-  adolescent: 'Adolescent',
-  adult: 'Adult',
+  child: 'child',
+  youth: 'youth',
+  adolescent: 'adolescent',
+  adult: 'adult',
 };
 
 function toBool(v: string): boolean {
@@ -239,6 +239,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
   const [departmentId, setDepartmentId] = useState<string>('');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
+  const [showMoreAddress, setShowMoreAddress] = useState(false);
 
   const formConfig = useMemo(() => getFormConfigByCategory(category), [category]);
   const totalSections = formConfig.sections.length + 1;
@@ -250,6 +251,7 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
   function handleCategoryChange(newCategory: RecordCategory) {
     setCategory(newCategory);
     setFormData({});
+    setShowMoreAddress(false);
     if (currentSection > 1) setCurrentSection(1);
   }
 
@@ -286,6 +288,18 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
 
     const name = formData.name || '';
     const ageStr = formData.age || '';
+    const dob = formData.dob || '';
+    const birthRegion = formData.birth_region || '';
+    const birthZone = formData.birth_zone || '';
+    const birthCity = formData.birth_city || '';
+    const birthWoreda = formData.birth_woreda || '';
+    const birthKebele = formData.birth_kebele || '';
+    const currentRegion = formData.current_region || '';
+    const currentZone = formData.current_zone || '';
+    const currentCity = formData.current_city || '';
+    const currentWoreda = formData.current_woreda || '';
+    const currentKebele = formData.current_kebele || '';
+    const nationality = formData.nationality || '';
 
     if (!name.trim()) {
       setError('Name is required');
@@ -299,6 +313,22 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
       setError('Valid age is required');
       const ageSection = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'age'));
       if (ageSection !== -1) setCurrentSection(ageSection + 2);
+      return;
+    }
+
+    if (!dob.trim()) {
+      setError('Date of birth is required');
+      const dobSection = formConfig.sections.findIndex((s) => s.fields.some((f) => f.id === 'dob'));
+      if (dobSection !== -1) setCurrentSection(dobSection + 2);
+      return;
+    }
+
+    if (!currentRegion.trim() || !currentZone.trim() || !currentCity.trim() || !nationality.trim()) {
+      setError('Current region, zone, city, and nationality are required');
+      const addrSection = formConfig.sections.findIndex((s) =>
+        s.fields.some((f) => f.id === 'current_region')
+      );
+      if (addrSection !== -1) setCurrentSection(addrSection + 2);
       return;
     }
 
@@ -370,13 +400,27 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
       }
     }
 
+    const trimmedName = name.trim();
     const payload: StudentCreate = {
-      name: name.trim(),
-      age,
-      sex,
-      church: debir.trim() || undefined,
+      full_name: trimmedName,
+      gender: sex as 'MALE' | 'FEMALE',
+      dob: dob.trim(),
+      photo_url: null,
       department_id: deptId,
       category: CATEGORY_API_VALUES[category],
+      address: {
+        birth_region: birthRegion.trim() || null,
+        birth_zone: birthZone.trim() || null,
+        birth_city: birthCity.trim() || null,
+        birth_woreda: birthWoreda.trim() || null,
+        birth_kebele: birthKebele.trim() || null,
+        current_region: currentRegion.trim(),
+        current_zone: currentZone.trim(),
+        current_city: currentCity.trim(),
+        current_woreda: currentWoreda.trim() || null,
+        current_kebele: currentKebele.trim() || null,
+        nationality: nationality.trim(),
+      },
       category_details: buildCategoryDetails(category, formData),
     };
 
@@ -491,59 +535,171 @@ export function AddRecordForm({ onCancel, onSuccess }: AddRecordFormProps) {
     );
   }
 
-  function renderDynamicSection(sectionIndex: number) {
+const OPTIONAL_ADDRESS_FIELD_IDS = new Set([
+  'birth_region',
+  'birth_zone',
+  'birth_city',
+  'birth_woreda',
+  'birth_kebele',
+  'current_woreda',
+  'current_kebele',
+]);
+
+function renderDynamicSection(sectionIndex: number) {
     const section = formConfig.sections[sectionIndex - 1];
+    let moreAddressRendered = false;
     return (
       <div className="space-y-4">
-        {section.fields.map((field) => (
-          <div key={field.id}>
-            <label htmlFor={field.id} className="block text-sm font-medium mb-2 text-text-primary">
-              {field.label}
-              {field.required && <span className="text-error"> *</span>}
-            </label>
-            {field.type === 'checkbox' ? (
-              <input
-                id={field.id}
-                type="checkbox"
-                checked={formData[field.id] === 'true'}
-                onChange={(e) => updateField(field.id, e.target.checked ? 'true' : 'false')}
-                className="h-4 w-4 rounded border-border/50 text-accent focus:ring-link/30"
-              />
-            ) : field.type === 'select' ? (
-              <Select value={formData[field.id] || ''} onValueChange={(v) => updateField(field.id, v)} required={field.required}>
-                <SelectTrigger id={field.id}>
-                  <SelectValue placeholder="Choose" />
-                </SelectTrigger>
-                <SelectContent>
-                  {field.options?.map((opt) => (
-                    <SelectItem key={opt} value={opt}>
-                      {opt}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : field.type === 'textarea' ? (
-              <textarea
-                id={field.id}
-                value={formData[field.id] || ''}
-                onChange={(e) => updateField(field.id, e.target.value)}
-                className="w-full min-h-[100px] px-4 py-3 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200 resize-none"
-                placeholder={field.placeholder}
-                required={field.required}
-              />
-            ) : (
-              <input
-                id={field.id}
-                type={field.type}
-                value={formData[field.id] || ''}
-                onChange={(e) => updateField(field.id, e.target.value)}
-                className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
-                placeholder={field.placeholder}
-                required={field.required}
-              />
-            )}
-          </div>
-        ))}
+        {section.fields.map((field) => {
+          const isOptionalAddress = OPTIONAL_ADDRESS_FIELD_IDS.has(field.id);
+          if (isOptionalAddress) {
+            if (!moreAddressRendered) {
+              moreAddressRendered = true;
+              if (!showMoreAddress) {
+                return (
+                  <div key="more-address" className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreAddress(true)}
+                      className="text-xs font-medium text-link hover:underline"
+                    >
+                      More address details
+                    </button>
+                  </div>
+                );
+              }
+              // showMoreAddress: render toggle + first optional field
+              return (
+                <div key={field.id}>
+                  <div className="mb-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowMoreAddress(false)}
+                      className="text-xs font-medium text-link hover:underline"
+                    >
+                      Hide additional address details
+                    </button>
+                  </div>
+                  <label htmlFor={field.id} className="block text-sm font-medium mb-2 text-text-primary">
+                    {field.label}
+                    {field.required && <span className="text-error"> *</span>}
+                  </label>
+                  {field.type === 'checkbox' ? (
+                    <input
+                      id={field.id}
+                      type="checkbox"
+                      checked={formData[field.id] === 'true'}
+                      onChange={(e) => updateField(field.id, e.target.checked ? 'true' : 'false')}
+                      className="h-4 w-4 rounded border-border/50 text-accent focus:ring-link/30"
+                    />
+                  ) : field.id === 'dob' ? (
+                    <input
+                      id={field.id}
+                      type="date"
+                      value={formData[field.id] || ''}
+                      onChange={(e) => updateField(field.id, e.target.value)}
+                      className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
+                      required={field.required}
+                    />
+                  ) : field.type === 'select' ? (
+                    <Select value={formData[field.id] || ''} onValueChange={(v) => updateField(field.id, v)} required={field.required}>
+                      <SelectTrigger id={field.id}>
+                        <SelectValue placeholder="Choose" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.options?.map((opt) => (
+                          <SelectItem key={opt} value={opt}>
+                            {opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : field.type === 'textarea' ? (
+                    <textarea
+                      id={field.id}
+                      value={formData[field.id] || ''}
+                      onChange={(e) => updateField(field.id, e.target.value)}
+                      className="w-full min-h-[100px] px-4 py-3 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200 resize-none"
+                      placeholder={field.placeholder}
+                      required={field.required}
+                    />
+                  ) : (
+                    <input
+                      id={field.id}
+                      type={field.type}
+                      value={formData[field.id] || ''}
+                      onChange={(e) => updateField(field.id, e.target.value)}
+                      className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
+                      placeholder={field.placeholder}
+                      required={field.required}
+                    />
+                  )}
+                </div>
+              );
+            }
+            // subsequent optional address fields: only render when expanded
+            if (!showMoreAddress) return null;
+          }
+
+          return (
+            <div key={field.id}>
+              <label htmlFor={field.id} className="block text-sm font-medium mb-2 text-text-primary">
+                {field.label}
+                {field.required && <span className="text-error"> *</span>}
+              </label>
+              {field.type === 'checkbox' ? (
+                <input
+                  id={field.id}
+                  type="checkbox"
+                  checked={formData[field.id] === 'true'}
+                  onChange={(e) => updateField(field.id, e.target.checked ? 'true' : 'false')}
+                  className="h-4 w-4 rounded border-border/50 text-accent focus:ring-link/30"
+                />
+              ) : field.id === 'dob' ? (
+                <input
+                  id={field.id}
+                  type="date"
+                  value={formData[field.id] || ''}
+                  onChange={(e) => updateField(field.id, e.target.value)}
+                  className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
+                  required={field.required}
+                />
+              ) : field.type === 'select' ? (
+                <Select value={formData[field.id] || ''} onValueChange={(v) => updateField(field.id, v)} required={field.required}>
+                  <SelectTrigger id={field.id}>
+                    <SelectValue placeholder="Choose" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {field.options?.map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : field.type === 'textarea' ? (
+                <textarea
+                  id={field.id}
+                  value={formData[field.id] || ''}
+                  onChange={(e) => updateField(field.id, e.target.value)}
+                  className="w-full min-h-[100px] px-4 py-3 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200 resize-none"
+                  placeholder={field.placeholder}
+                  required={field.required}
+                />
+              ) : (
+                <input
+                  id={field.id}
+                  type={field.type}
+                  value={formData[field.id] || ''}
+                  onChange={(e) => updateField(field.id, e.target.value)}
+                  className="w-full min-h-[44px] px-4 rounded-lg border border-border/50 bg-bg-beige-light text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-link/30 focus:border-link/30 transition-all duration-200"
+                  placeholder={field.placeholder}
+                  required={field.required}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     );
   }

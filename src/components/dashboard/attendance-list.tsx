@@ -60,7 +60,7 @@ export function AttendanceList(_props: AttendanceListProps) {
       list = list.filter((s) => new Date(s.date) <= new Date(dateRangeEnd));
     }
 
-    return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return [...list].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [sessions, dateFilter, dateRangeStart, dateRangeEnd]);
 
   const { data: allDepartments = [] } = useListDepartmentsQuery();

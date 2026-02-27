@@ -7,10 +7,11 @@ interface StatisticsTableViewProps {
   byCategory: Record<RecordCategory, number>;
   totalStudents: number;
   totalDepartments: number;
-  totalSessions: number;
-  overallRate: number;
-  attendancePresent: number;
-  attendanceTotal: number;
+  // Optional legacy attendance props (no longer used on dashboard)
+  totalSessions?: number;
+  overallRate?: number;
+  attendancePresent?: number;
+  attendanceTotal?: number;
   totalAdmins: number;
   totalManagers: number;
   activeAdmins: number;
@@ -24,10 +25,6 @@ export function StatisticsTableView({
   byCategory,
   totalStudents,
   totalDepartments,
-  totalSessions,
-  overallRate,
-  attendancePresent,
-  attendanceTotal,
   totalAdmins,
   totalManagers,
   activeAdmins,
@@ -62,22 +59,6 @@ export function StatisticsTableView({
               <tr className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
                 <td className="px-5 py-3 text-sm font-medium text-text-primary">Total Departments</td>
                 <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{totalDepartments}</td>
-              </tr>
-              <tr className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
-                <td className="px-5 py-3 text-sm font-medium text-text-primary">Total Sessions</td>
-                <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">{totalSessions}</td>
-              </tr>
-              <tr className="border-b border-border/30 hover:bg-bg-beige-light/50 transition-colors">
-                <td className="px-5 py-3 text-sm font-medium text-text-primary">Overall Attendance Rate</td>
-                <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">
-                  {attendanceTotal ? `${overallRate}%` : '—'}
-                </td>
-              </tr>
-              <tr className="hover:bg-bg-beige-light/50 transition-colors">
-                <td className="px-5 py-3 text-sm font-medium text-text-primary">Total Present</td>
-                <td className="px-5 py-3 text-sm text-text-secondary text-right tabular-nums">
-                  {attendancePresent} / {attendanceTotal}
-                </td>
               </tr>
             </tbody>
           </table>
