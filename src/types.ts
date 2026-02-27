@@ -218,19 +218,28 @@ export interface PersonRecord {
   [key: string]: string | number | undefined;
 }
 
-export interface Event {
-  id: string;
+export type ProgramType = 'REGULAR';
+
+export interface Program {
+  id: number;
   name: string;
-  category: RecordCategory;
+  department_id: number;
+  type: ProgramType;
+  description: string;
+  is_active: boolean;
+}
+
+export interface ProgramCreate {
+  name: string;
+  department_id: number;
+  type: ProgramType;
   description?: string;
-  isDefault: boolean;
-  createdAt: string;
 }
 
 export interface Attendance {
   id: string;
   recordId: string;
-  eventId: string;
+  programId: string;
   date: string;
   time?: string;
   status: AttendanceStatus;
@@ -238,18 +247,20 @@ export interface Attendance {
   createdAt: string;
 }
 
-export type AttendanceSessionType = 'REGULAR' | 'EVENT';
+export type AttendanceSessionType = 'REGULAR' | 'PROGRAM';
+
+export type AttendanceRecordStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
 
 export interface AttendanceRecordResponse {
   id: number;
   student_id: number;
-  present: boolean;
-  notes?: string | null;
+  status: AttendanceRecordStatus;
+  remarks?: string | null;
 }
 
 export interface AttendanceRecordCreate {
   student_id: number;
-  present: boolean;
+  status: AttendanceRecordStatus;
   notes?: string | null;
 }
 
@@ -257,23 +268,18 @@ export interface AttendanceSession {
   id: number;
   date: string;
   department_id: number;
+  program_id: number;
   category: string;
   type: AttendanceSessionType;
   records: AttendanceRecordResponse[];
-}
-
-export interface AttendanceSessionCreate {
-  date: string;
-  department_id?: number;
-  category?: string;
-  type?: AttendanceSessionType;
-  records?: AttendanceRecordCreate[] | null;
+  is_active: boolean;
 }
 
 export interface AttendanceSessionListParams {
+  program_id?: number | null;
   department_id?: number | null;
   category?: string | null;
-  type?: AttendanceSessionType | null;
+  include_inactive?: boolean;
 }
 
 export interface EligibleStudentsParams {
@@ -283,8 +289,7 @@ export interface EligibleStudentsParams {
 
 export interface AttendanceBatchCreate {
   date: string;
-  department_id: number;
+  program_id: number;
   category: string;
-  type: AttendanceSessionType;
-  records: AttendanceRecordCreate[];
+  records: Array<{ student_id: number; status: AttendanceRecordStatus; notes?: string | null }>;
 }

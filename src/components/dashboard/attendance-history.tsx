@@ -45,8 +45,8 @@ export function AttendanceHistory({ recordId, attendanceHref }: AttendanceHistor
           sessionId: session.id,
           date: session.date,
           type: session.type,
-          present: rec.present,
-          notes: rec.notes ?? null,
+          present: rec.status === 'PRESENT',
+          notes: rec.remarks ?? null,
         });
       }
     }

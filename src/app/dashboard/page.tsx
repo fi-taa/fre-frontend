@@ -87,7 +87,7 @@ export default function DashboardPage() {
       const slug = apiCategoryToSlug(s.category);
       byCategory[slug] = (byCategory[slug] ?? 0) + 1;
     }
-    const totalPresent = filteredSessions.reduce((sum, sess) => sum + sess.records.filter((r) => r.present).length, 0);
+    const totalPresent = filteredSessions.reduce((sum, sess) => sum + sess.records.filter((r) => r.status === 'PRESENT').length, 0);
     const totalRecords = filteredSessions.reduce((sum, sess) => sum + sess.records.length, 0);
     const attendanceByCategory: Record<RecordCategory, { present: number; total: number }> = {
       child: { present: 0, total: 0 },
@@ -97,7 +97,7 @@ export default function DashboardPage() {
     };
     for (const sess of filteredSessions) {
       const slug = apiCategoryToSlug(sess.category);
-      const present = sess.records.filter((r) => r.present).length;
+      const present = sess.records.filter((r) => r.status === 'PRESENT').length;
       attendanceByCategory[slug].present += present;
       attendanceByCategory[slug].total += sess.records.length;
     }
@@ -105,7 +105,7 @@ export default function DashboardPage() {
       .slice()
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .map((s) => {
-        const present = s.records.filter((r) => r.present).length;
+        const present = s.records.filter((r) => r.status === 'PRESENT').length;
         const total = s.records.length;
         return {
           id: s.id,

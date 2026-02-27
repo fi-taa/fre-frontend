@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
+import { useListProgramsQuery } from '@/store/slices/programsApi';
 import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 import {
   useGetEligibleStudentsQuery,
@@ -10,7 +11,6 @@ import {
 import { RECORD_CATEGORIES, CATEGORY_LABELS, CATEGORY_API_VALUES } from '@/types';
 import type { RecordCategory } from '@/types';
 import type { Student } from '@/types';
-import type { AttendanceSessionType } from '@/types';
 
 interface AttendanceFormProps {
   onSuccess: () => void;
@@ -18,17 +18,12 @@ interface AttendanceFormProps {
   initialRecordId?: string;
 }
 
-const SESSION_TYPES: { value: AttendanceSessionType; label: string }[] = [
-  { value: 'REGULAR', label: 'Regular' },
-  { value: 'EVENT', label: 'Event' },
-];
-
 export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormProps) {
   const today = new Date().toISOString().split('T')[0];
   const [departmentId, setDepartmentId] = useState<string>('');
+  const [programId, setProgramId] = useState<string>('');
   const [date, setDate] = useState(today);
   const [category, setCategory] = useState<RecordCategory | ''>('');
-  const [sessionType, setSessionType] = useState<AttendanceSessionType>('REGULAR');
   const [searchTerm, setSearchTerm] = useState('');
   const [presentByStudentId, setPresentByStudentId] = useState<Map<number, boolean>>(new Map());
   const [globalNotes, setGlobalNotes] = useState('');
@@ -36,7 +31,12 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
 
   const { data: allDepartments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
   const { data: currentUserData } = useGetCurrentUserQuery();
-  
+  const departmentIdNum = departmentId ? parseInt(departmentId, 10) : 0;
+  const { data: programs = [], isLoading: programsLoading } = useListProgramsQuery(
+    { department_id: departmentIdNum, include_inactive: false },
+    { skip: departmentIdNum <= 0 }
+  );
+
   const currentUser = currentUserData?.data;
   const isSuperAdmin = currentUser?.role === 'super_admin';
   const isAdmin = currentUser?.role === 'admin';
@@ -56,7 +56,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
     }
     return [];
   }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);
-  const departmentIdNum = departmentId ? parseInt(departmentId, 10) : 0;
+
   const categoryApi = category ? CATEGORY_API_VALUES[category] : '';
   const canFetchEligible =
     departmentIdNum > 0 && categoryApi !== '';
@@ -105,34 +105,33 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitError(null);
-    if (!departmentId || !category) {
-      setSubmitError('Select department and category.');
+    if (!departmentId || !programId || !category) {
+      setSubmitError('Select department, program, and category.');
       return;
     }
-    const deptId = parseInt(departmentId, 10);
-    if (isNaN(deptId)) {
-      setSubmitError('Invalid department.');
+    const progId = parseInt(programId, 10);
+    if (isNaN(progId)) {
+      setSubmitError('Invalid program.');
       return;
     }
-    const records = eligibleStudents.map((s: Student) => ({
-      student_id: s.id,
-      present: presentByStudentId.get(s.id) ?? false,
-      notes: globalNotes.trim() || undefined,
-    }));
-    if (records.every((r) => !r.present)) {
+    const records = eligibleStudents.map((s: Student) => {
+      const present = presentByStudentId.get(s.id) ?? false;
+      return {
+        student_id: s.id,
+        status: (present ? 'PRESENT' : 'ABSENT') as 'PRESENT' | 'ABSENT',
+        notes: globalNotes.trim() || undefined,
+      };
+    });
+    if (records.every((r) => r.status !== 'PRESENT')) {
       setSubmitError('Mark at least one person present, or add records for absent.');
       return;
     }
     try {
       await createBatch({
-        department_id: deptId,
-        body: {
-          date,
-          department_id: deptId,
-          category: categoryApi,
-          type: sessionType,
-          records,
-        },
+        date,
+        program_id: progId,
+        category: categoryApi,
+        records,
       }).unwrap();
       setPresentByStudentId(new Map());
       setGlobalNotes('');
@@ -146,7 +145,7 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
     }
   }
 
-  const isFormValid = departmentId && category && eligibleStudents.length > 0;
+  const isFormValid = departmentId && programId && category && eligibleStudents.length > 0;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -165,7 +164,10 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
               type="number"
               min={1}
               value={departmentId}
-              onChange={(e) => setDepartmentId(e.target.value)}
+              onChange={(e) => {
+                setDepartmentId(e.target.value);
+                setProgramId('');
+              }}
               placeholder="Department ID"
               className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             />
@@ -173,7 +175,10 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
             <select
               id="att-dept"
               value={departmentId}
-              onChange={(e) => setDepartmentId(e.target.value)}
+              onChange={(e) => {
+                setDepartmentId(e.target.value);
+                setProgramId('');
+              }}
               required
               className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
             >
@@ -181,6 +186,35 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
               {departments.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div>
+          <label htmlFor="att-program" className="block text-xs font-medium mb-1.5 text-text-secondary">
+            Program <span className="text-error">*</span>
+          </label>
+          {programsLoading || departmentIdNum <= 0 ? (
+            <div className="h-9 px-3 rounded-lg border border-border/40 bg-bg-beige-light flex items-center text-xs text-text-secondary">
+              {departmentIdNum <= 0 ? 'Select department first' : 'Loading...'}
+            </div>
+          ) : programs.length === 0 ? (
+            <div className="h-9 px-3 rounded-lg border border-border/40 bg-bg-beige-light flex items-center text-xs text-text-secondary">
+              No programs
+            </div>
+          ) : (
+            <select
+              id="att-program"
+              value={programId}
+              onChange={(e) => setProgramId(e.target.value)}
+              required
+              className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
+            >
+              <option value="">Choose program</option>
+              {programs.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
                 </option>
               ))}
             </select>
@@ -214,23 +248,6 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
             {RECORD_CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
                 {CATEGORY_LABELS[cat]}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="att-type" className="block text-xs font-medium mb-1.5 text-text-secondary">
-            Type <span className="text-error">*</span>
-          </label>
-          <select
-            id="att-type"
-            value={sessionType}
-            onChange={(e) => setSessionType(e.target.value as AttendanceSessionType)}
-            className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
-          >
-            {SESSION_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
               </option>
             ))}
           </select>

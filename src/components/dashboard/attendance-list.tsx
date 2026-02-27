@@ -4,24 +4,23 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useListAttendanceSessionsQuery, useGetAttendanceSessionQuery } from '@/store/slices/attendanceApi';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
+import { useListProgramsQuery } from '@/store/slices/programsApi';
 import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
 import { useListStudentsQuery } from '@/store/slices/studentsApi';
 import { apiCategoryToSlug, CATEGORY_API_VALUES } from '@/types';
 import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
-import type { AttendanceSession, AttendanceSessionType } from '@/types';
+import type { AttendanceSession } from '@/types';
 
 interface AttendanceListProps {
   recordId?: string;
-  eventId?: string;
+  programId?: string;
 }
-
-const SESSION_TYPES: AttendanceSessionType[] = ['REGULAR', 'EVENT'];
 
 export function AttendanceList(_props: AttendanceListProps) {
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const [categoryFilter, setCategoryFilter] = useState<RecordCategory | 'all'>('all');
-  const [typeFilter, setTypeFilter] = useState<AttendanceSessionType | 'all'>('all');
+  const [programFilter, setProgramFilter] = useState<string>('');
   const [dateFilter, setDateFilter] = useState('');
   const [dateRangeStart, setDateRangeStart] = useState('');
   const [dateRangeEnd, setDateRangeEnd] = useState('');
@@ -29,13 +28,14 @@ export function AttendanceList(_props: AttendanceListProps) {
   const [expandedSessionId, setExpandedSessionId] = useState<number | null>(null);
 
   const listParams = useMemo(() => {
-    const params: { department_id?: number; category?: string; type?: AttendanceSessionType } = {};
+    const params: { program_id?: number; department_id?: number; category?: string; include_inactive?: boolean } = {};
+    const prog = programFilter ? parseInt(programFilter, 10) : undefined;
     const dept = departmentFilter ? parseInt(departmentFilter, 10) : undefined;
+    if (prog && !isNaN(prog)) params.program_id = prog;
     if (dept && !isNaN(dept)) params.department_id = dept;
     if (categoryFilter !== 'all') params.category = CATEGORY_API_VALUES[categoryFilter];
-    if (typeFilter !== 'all') params.type = typeFilter;
     return params;
-  }, [departmentFilter, categoryFilter, typeFilter]);
+  }, [programFilter, departmentFilter, categoryFilter]);
 
   const { data: sessions = [], isLoading: sessionsLoading } = useListAttendanceSessionsQuery(
     Object.keys(listParams).length > 0 ? listParams : undefined
@@ -84,12 +84,18 @@ export function AttendanceList(_props: AttendanceListProps) {
     return [];
   }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);
   
+  const departmentIdNum = departmentFilter ? parseInt(departmentFilter, 10) : 0;
+  const { data: programs = [] } = useListProgramsQuery(
+    { department_id: departmentIdNum, include_inactive: false },
+    { skip: departmentIdNum <= 0 }
+  );
   const departmentMap = useMemo(() => new Map(departments.map((d) => [d.id, d.name])), [departments]);
+  const programMap = useMemo(() => new Map(programs.map((p) => [p.id, p.name])), [programs]);
 
   const hasActiveFilters =
     departmentFilter !== '' ||
     categoryFilter !== 'all' ||
-    typeFilter !== 'all' ||
+    programFilter !== '' ||
     dateFilter !== '' ||
     dateRangeStart !== '' ||
     dateRangeEnd !== '';
@@ -97,7 +103,7 @@ export function AttendanceList(_props: AttendanceListProps) {
   const activeFilterCount = [
     departmentFilter !== '',
     categoryFilter !== 'all',
-    typeFilter !== 'all',
+    programFilter !== '',
     dateFilter !== '',
     dateRangeStart !== '' || dateRangeEnd !== '',
   ].filter(Boolean).length;
@@ -105,7 +111,7 @@ export function AttendanceList(_props: AttendanceListProps) {
   function clearAllFilters() {
     setDepartmentFilter('');
     setCategoryFilter('all');
-    setTypeFilter('all');
+    setProgramFilter('');
     setDateFilter('');
     setDateRangeStart('');
     setDateRangeEnd('');
@@ -151,7 +157,10 @@ export function AttendanceList(_props: AttendanceListProps) {
               <select
                 id="list-dept"
                 value={departmentFilter}
-                onChange={(e) => setDepartmentFilter(e.target.value)}
+                onChange={(e) => {
+                  setDepartmentFilter(e.target.value);
+                  setProgramFilter('');
+                }}
                 className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               >
                 <option value="">All</option>
@@ -181,19 +190,19 @@ export function AttendanceList(_props: AttendanceListProps) {
               </select>
             </div>
             <div>
-              <label htmlFor="list-type" className="block text-xs font-medium mb-1.5 text-text-secondary">
-                Type
+              <label htmlFor="list-program" className="block text-xs font-medium mb-1.5 text-text-secondary">
+                Program
               </label>
               <select
-                id="list-type"
-                value={typeFilter}
-                onChange={(e) => setTypeFilter((e.target.value || 'all') as AttendanceSessionType | 'all')}
+                id="list-program"
+                value={programFilter}
+                onChange={(e) => setProgramFilter(e.target.value)}
                 className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
               >
-                <option value="all">All</option>
-                {SESSION_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                <option value="">All</option>
+                {programs.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
                   </option>
                 ))}
               </select>
@@ -271,7 +280,7 @@ export function AttendanceList(_props: AttendanceListProps) {
                       Category
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-                      Type
+                      Program
                     </th>
                     <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary whitespace-nowrap">
                       Records
@@ -294,6 +303,7 @@ export function AttendanceList(_props: AttendanceListProps) {
                     key={session.id}
                     session={session}
                     departmentName={departmentMap.get(session.department_id) ?? `#${session.department_id}`}
+                    programName={programMap.get(session.program_id) ?? `#${session.program_id}`}
                     isExpanded={expandedSessionId === session.id}
                     onToggle={() => setExpandedSessionId((id) => (id === session.id ? null : session.id))}
                   />
@@ -312,13 +322,14 @@ export function AttendanceList(_props: AttendanceListProps) {
 interface SessionRowProps {
   session: AttendanceSession;
   departmentName: string;
+  programName: string;
   isExpanded: boolean;
   onToggle: () => void;
 }
 
-function SessionRow({ session, departmentName, isExpanded, onToggle }: SessionRowProps) {
+function SessionRow({ session, departmentName, programName, isExpanded, onToggle }: SessionRowProps) {
   const categorySlug = apiCategoryToSlug(session.category);
-  const presentCount = session.records.filter((r) => r.present).length;
+  const presentCount = session.records.filter((r) => r.status === 'PRESENT').length;
 
   return (
     <>
@@ -331,7 +342,7 @@ function SessionRow({ session, departmentName, isExpanded, onToggle }: SessionRo
         </td>
         <td className="px-3 py-2.5 text-sm text-text-primary">{departmentName}</td>
         <td className="px-3 py-2.5 text-sm text-text-primary">{CATEGORY_LABELS[categorySlug]}</td>
-        <td className="px-3 py-2.5 text-sm text-text-primary">{session.type}</td>
+        <td className="px-3 py-2.5 text-sm text-text-primary">{programName}</td>
         <td className="px-3 py-2.5 text-sm text-text-primary">
           {presentCount} / {session.records.length}
         </td>
@@ -385,14 +396,14 @@ function SessionDetail({ sessionId }: SessionDetailProps) {
                 </Link>
                 <span
                   className={`shrink-0 px-2 py-0.5 text-xs font-medium rounded-full ${
-                    rec.present ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    rec.status === 'PRESENT' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}
                 >
-                  {rec.present ? 'Present' : 'Absent'}
+                  {rec.status}
                 </span>
-                {rec.notes && (
-                  <span className="text-xs text-text-secondary truncate max-w-[120px]" title={rec.notes}>
-                    {rec.notes}
+                {(rec.remarks ?? null) && (
+                  <span className="text-xs text-text-secondary truncate max-w-[120px]" title={rec.remarks ?? undefined}>
+                    {rec.remarks}
                   </span>
                 )}
               </li>

@@ -35,7 +35,7 @@ export function findUserByUsername(username: string): LocalAuthUser | undefined 
   return users.find((user) => user.username === username);
 }
 
-export function getAttendances(recordId?: string, eventId?: string): Attendance[] {
+export function getAttendances(recordId?: string, programId?: string): Attendance[] {
   if (typeof window === 'undefined') {
     return [];
   }
@@ -53,8 +53,8 @@ export function getAttendances(recordId?: string, eventId?: string): Attendance[
       filtered = filtered.filter((attendance) => attendance.recordId === recordId);
     }
     
-    if (eventId) {
-      filtered = filtered.filter((attendance) => attendance.eventId === eventId);
+    if (programId) {
+      filtered = filtered.filter((attendance) => attendance.programId === programId);
     }
     
     return filtered;

@@ -2,7 +2,6 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/store/baseQuery';
 import type {
   AttendanceSession,
-  AttendanceSessionCreate,
   AttendanceSessionListParams,
   AttendanceRecordCreate,
   AttendanceRecordResponse,
@@ -17,19 +16,6 @@ export const attendanceApi = createApi({
   tagTypes: ['AttendanceSession', 'EligibleStudents'],
   keepUnusedDataFor: 300,
   endpoints: (builder) => ({
-    createAttendanceSession: builder.mutation<
-      AttendanceSession,
-      { department_id: number; body: AttendanceSessionCreate }
-    >({
-      query: ({ department_id, body }) => ({
-        url: '/attendance/sessions/',
-        method: 'POST',
-        params: { department_id },
-        body,
-      }),
-      invalidatesTags: ['AttendanceSession'],
-    }),
-
     listAttendanceSessions: builder.query<AttendanceSession[], AttendanceSessionListParams | void>({
       query: (params) => ({
         url: '/attendance/sessions/',
@@ -56,38 +42,20 @@ export const attendanceApi = createApi({
         url: '/attendance/eligible-students/',
         params,
       }),
-      transformResponse: (
-        response: Student[] | { data?: Student[]; items?: Student[]; results?: Student[] }
-      ): Student[] =>
-        Array.isArray(response)
-          ? response
-          : (response.data ?? response.items ?? response.results ?? []),
+      transformResponse: (response: unknown): Student[] => {
+        const list = Array.isArray(response) ? response : (response as { data?: unknown[] })?.data ?? [];
+        return list.map((s: { id: number; full_name?: string; name?: string; [k: string]: unknown }) => ({
+          ...s,
+          name: s.full_name ?? s.name ?? '',
+        })) as Student[];
+      },
       providesTags: ['EligibleStudents'],
     }),
 
-    addSessionRecord: builder.mutation<
-      AttendanceRecordResponse,
-      { session_id: number; department_id: number; body: AttendanceRecordCreate }
-    >({
-      query: ({ session_id, department_id, body }) => ({
-        url: `/attendance/sessions/${session_id}/records/`,
+    createAttendanceBatch: builder.mutation<string, AttendanceBatchCreate>({
+      query: (body) => ({
+        url: '/attendance/sessions/',
         method: 'POST',
-        params: { department_id },
-        body,
-      }),
-      invalidatesTags: (_result, _error, { session_id }) => [
-        { type: 'AttendanceSession', id: session_id },
-      ],
-    }),
-
-    createAttendanceBatch: builder.mutation<
-      string,
-      { department_id: number; body: AttendanceBatchCreate }
-    >({
-      query: ({ department_id, body }) => ({
-        url: '/attendance/sessions/batch',
-        method: 'POST',
-        params: { department_id },
         body,
       }),
       invalidatesTags: ['AttendanceSession'],
@@ -95,12 +63,11 @@ export const attendanceApi = createApi({
 
     collectAttendance: builder.mutation<
       AttendanceRecordResponse,
-      { session_id: number; department_id: number; body: AttendanceRecordCreate }
+      { session_id: number; body: AttendanceRecordCreate }
     >({
-      query: ({ session_id, department_id, body }) => ({
+      query: ({ session_id, body }) => ({
         url: `/attendance/sessions/${session_id}/collect/`,
         method: 'POST',
-        params: { department_id },
         body,
       }),
       invalidatesTags: (_result, _error, { session_id }) => [
@@ -111,11 +78,9 @@ export const attendanceApi = createApi({
 });
 
 export const {
-  useCreateAttendanceSessionMutation,
   useListAttendanceSessionsQuery,
   useGetAttendanceSessionQuery,
   useGetEligibleStudentsQuery,
-  useAddSessionRecordMutation,
   useCreateAttendanceBatchMutation,
   useCollectAttendanceMutation,
 } = attendanceApi;
