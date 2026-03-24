@@ -4,14 +4,14 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { handleLogout } from '@/lib/auth-helpers';
-import { clearAuth } from '@/store/slices/authSlice';
+import { handleLogout as logoutAndResetCache } from '@/lib/auth-helpers';
 import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { UsersTable } from '@/components/dashboard/users-table';
 import { PageLoader } from '@/components/ui/page-loader';
 import { useGetCurrentUserQuery, useListUsersQuery, useListManagersQuery } from '@/store/slices/usersApi';
 import type { User } from '@/types';
+import { useDashboardAccess } from '@/hooks/use-dashboard-access';
 
 export default function ManagersPage() {
   const router = useRouter();
@@ -21,12 +21,15 @@ export default function ManagersPage() {
   const { data: currentUserData } = useGetCurrentUserQuery();
   const currentUser = currentUserData?.data;
   const isSuperAdmin = currentUser?.role === 'super_admin';
+  const { isMounted: isAccessMounted, isAuthenticated: isAccessAuthenticated, isReady, isAllowed } = useDashboardAccess({
+    allowedRoles: ['admin', 'super_admin'],
+  });
   
   const { data: allUsersData, isLoading: allUsersLoading, error: allUsersError } = useListUsersQuery(undefined, {
-    skip: !isSuperAdmin,
+    skip: !currentUser || !isSuperAdmin,
   });
   const { data: managersData, isLoading: managersLoading, error: managersError } = useListManagersQuery(undefined, {
-    skip: isSuperAdmin,
+    skip: !currentUser || isSuperAdmin,
   });
 
   const allUsers = isSuperAdmin ? (allUsersData?.data || []) : (managersData?.data || []);
@@ -60,20 +63,8 @@ export default function ManagersPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-    if (currentUser && currentUser.role !== 'admin' && currentUser.role !== 'super_admin') {
-      router.push('/dashboard');
-      return;
-    }
-  }, [mounted, isAuthenticated, currentUser, router]);
-
   function handleLogout() {
-    dispatch(clearAuth());
+    logoutAndResetCache(dispatch);
     router.push('/login');
   }
 
@@ -81,7 +72,7 @@ export default function ManagersPage() {
     // Notifications not implemented yet
   }
 
-  if (!mounted) {
+  if (!mounted || !isAccessMounted || !isReady) {
     return (
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
@@ -95,7 +86,7 @@ export default function ManagersPage() {
     );
   }
 
-  if (!isAuthenticated || (currentUser && currentUser.role !== 'admin' && currentUser.role !== 'super_admin')) {
+  if (!isAuthenticated || !isAccessAuthenticated || !isAllowed) {
     return null;
   }
 

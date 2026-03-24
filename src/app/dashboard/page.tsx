@@ -44,10 +44,10 @@ export default function DashboardPage() {
   const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
 
   const { data: allUsersData, isLoading: allUsersLoading } = useListUsersQuery(undefined, {
-    skip: !isSuperAdmin,
+    skip: !currentUser || !isSuperAdmin,
   });
   const { data: managersData, isLoading: managersLoading } = useListManagersQuery(undefined, {
-    skip: isSuperAdmin,
+    skip: !currentUser || isSuperAdmin,
   });
 
   const allUsers = isSuperAdmin ? (allUsersData?.data || []) : (managersData?.data || []);

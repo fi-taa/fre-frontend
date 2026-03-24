@@ -11,6 +11,7 @@ import { UsersTable } from '@/components/dashboard/users-table';
 import { PageLoader } from '@/components/ui/page-loader';
 import { useGetCurrentUserQuery, useListUsersQuery, useDeleteAdminMutation } from '@/store/slices/usersApi';
 import type { User } from '@/types';
+import { useDashboardAccess } from '@/hooks/use-dashboard-access';
 
 export default function AdminsPage() {
   const router = useRouter();
@@ -24,6 +25,9 @@ export default function AdminsPage() {
 
   const currentUser = currentUserData?.data;
   const allUsers = usersData?.data || [];
+  const { isMounted: isAccessMounted, isAuthenticated: isAccessAuthenticated, isReady, isAllowed } = useDashboardAccess({
+    allowedRoles: ['super_admin'],
+  });
 
   const admins = useMemo(() => {
     return allUsers.filter((user) => user.role === 'admin');
@@ -42,18 +46,6 @@ export default function AdminsPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-    if (currentUser && currentUser.role !== 'super_admin') {
-      router.push('/dashboard');
-      return;
-    }
-  }, [mounted, isAuthenticated, currentUser, router]);
 
   function onLogout() {
     logoutAndResetCache(dispatch);
@@ -75,7 +67,7 @@ export default function AdminsPage() {
     }
   }
 
-  if (!mounted) {
+  if (!mounted || !isAccessMounted || !isReady) {
     return (
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
@@ -89,7 +81,7 @@ export default function AdminsPage() {
     );
   }
 
-  if (!isAuthenticated || (currentUser && currentUser.role !== 'super_admin')) {
+  if (!isAuthenticated || !isAccessAuthenticated || !isAllowed) {
     return null;
   }
 

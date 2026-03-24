@@ -4,8 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { handleLogout } from '@/lib/auth-helpers';
-import { clearAuth } from '@/store/slices/authSlice';
+import { handleLogout as logoutAndResetCache } from '@/lib/auth-helpers';
 import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { PageLoader } from '@/components/ui/page-loader';
@@ -16,6 +15,7 @@ import { DonutChart } from '@/components/dashboard/charts/donut-chart';
 import { useGetCurrentUserQuery, useListUsersQuery } from '@/store/slices/usersApi';
 import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
 import type { User } from '@/types';
+import { useDashboardAccess } from '@/hooks/use-dashboard-access';
 
 export default function AnalyticsPage() {
   const router = useRouter();
@@ -24,10 +24,16 @@ export default function AnalyticsPage() {
   const [view, setView] = useState<'table' | 'graph'>('graph');
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { data: currentUserData } = useGetCurrentUserQuery();
-  const { data: usersData, isLoading: usersLoading } = useListUsersQuery();
-  const { data: departments = [] } = useListDepartmentsQuery();
-
   const currentUser = currentUserData?.data;
+  const { isMounted: isAccessMounted, isAuthenticated: isAccessAuthenticated, isReady, isAllowed } = useDashboardAccess({
+    allowedRoles: ['super_admin'],
+  });
+  const { data: usersData, isLoading: usersLoading } = useListUsersQuery(undefined, {
+    skip: !currentUser || currentUser.role !== 'super_admin',
+  });
+  const { data: departments = [] } = useListDepartmentsQuery(undefined, {
+    skip: !currentUser || currentUser.role !== 'super_admin',
+  });
   const allUsers = usersData?.data || [];
 
   const analytics = useMemo(() => {
@@ -72,20 +78,8 @@ export default function AnalyticsPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-    if (currentUser && currentUser.role !== 'super_admin') {
-      router.push('/dashboard');
-      return;
-    }
-  }, [mounted, isAuthenticated, currentUser, router]);
-
   function handleLogout() {
-    dispatch(clearAuth());
+    logoutAndResetCache(dispatch);
     router.push('/login');
   }
 
@@ -93,7 +87,7 @@ export default function AnalyticsPage() {
     // Notifications not implemented yet
   }
 
-  if (!mounted) {
+  if (!mounted || !isAccessMounted || !isReady) {
     return (
       <div className="min-h-screen bg-bg-beige flex flex-col relative">
         <div className="fixed inset-0 opacity-[0.02] pointer-events-none z-0" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '60px 60px' }} />
@@ -107,7 +101,7 @@ export default function AnalyticsPage() {
     );
   }
 
-  if (!isAuthenticated || (currentUser && currentUser.role !== 'super_admin')) {
+  if (!isAuthenticated || !isAccessAuthenticated || !isAllowed) {
     return null;
   }
 

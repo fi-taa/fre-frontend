@@ -161,18 +161,9 @@ export function AttendanceForm({ onSuccess, initialRecordId }: AttendanceFormPro
               {t('attendance.loadingDepartments')}
             </div>
           ) : departments.length === 0 ? (
-            <input
-              id="att-dept"
-              type="number"
-              min={1}
-              value={departmentId}
-              onChange={(e) => {
-                setDepartmentId(e.target.value);
-                setProgramId('');
-              }}
-              placeholder={t('attendance.departmentIdPlaceholder')}
-              className="w-full h-9 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
-            />
+            <div className="h-9 px-3 rounded-lg border border-border/40 bg-bg-beige-light flex items-center text-xs text-text-secondary">
+              No departments available
+            </div>
           ) : (
             <select
               id="att-dept"
