@@ -18,7 +18,7 @@ export interface AttendanceQrScreenProps {
 }
 
 function isScanTargetStatus(status: AttendanceRecordStatus): boolean {
-  return status === 'PRESENT' || status === 'LATE' || status === 'EXCUSED';
+  return status === 'PRESENT' || status === 'EXCUSED';
 }
 
 export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
@@ -131,17 +131,15 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
 
   const counts = useMemo(() => {
     let present = 0;
-    let late = 0;
     let excused = 0;
     let missing = 0;
     for (const status of statusByStudentId.values()) {
       if (status === 'PRESENT') present += 1;
-      else if (status === 'LATE') late += 1;
       else if (status === 'EXCUSED') excused += 1;
       else missing += 1;
     }
 
-    return { present, late, excused, missing, total: eligibleStudents.length };
+    return { present, excused, missing, total: eligibleStudents.length };
   }, [statusByStudentId, eligibleStudents.length]);
 
   const filtersDisabled = attendanceSessionId !== null;
@@ -254,7 +252,7 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
       });
 
       const nextLabel =
-        scanStatus === 'PRESENT' ? 'Present' : scanStatus === 'LATE' ? 'Late' : scanStatus === 'EXCUSED' ? 'Excused' : 'Marked';
+        scanStatus === 'PRESENT' ? 'Present' : scanStatus === 'EXCUSED' ? 'Excused' : 'Marked';
       setScanFeedback(`${student.name} marked as ${nextLabel}`);
     } catch {
       setScanFeedback('Failed to save attendance');
@@ -456,7 +454,7 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
                 <div className="flex gap-2 flex-wrap items-center">
                   <span className="text-xs text-text-secondary">Mark scanned QR as</span>
                   <div className="flex gap-2">
-                    {(['PRESENT', 'LATE', 'EXCUSED'] as AttendanceRecordStatus[]).filter(isScanTargetStatus).map((status) => (
+                    {(['PRESENT', 'EXCUSED'] as AttendanceRecordStatus[]).filter(isScanTargetStatus).map((status) => (
                       <button
                         key={status}
                         type="button"
@@ -468,7 +466,7 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
                             : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
                         }`}
                       >
-                        {status === 'PRESENT' ? 'Present' : status === 'LATE' ? 'Late' : 'Excused'}
+                        {status === 'PRESENT' ? 'Present' : 'Excused'}
                       </button>
                     ))}
                   </div>
@@ -477,9 +475,6 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-bg-beige-light text-text-secondary">
                     Present {counts.present}
-                  </span>
-                  <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-link/5 text-link">
-                    Late {counts.late}
                   </span>
                   <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-accent/10 text-accent">
                     Excused {counts.excused}
@@ -504,9 +499,7 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
                   ) : (
                     <div className="min-h-[320px] flex flex-col items-center justify-center text-center p-4">
                       <div className="text-sm font-medium text-text-primary">Scanner is off</div>
-                      <div className="text-xs text-text-secondary mt-1.5">
-                        {scanStatus === 'PRESENT' ? 'Marking as Present' : scanStatus === 'LATE' ? 'Marking as Late' : 'Marking as Excused'}
-                      </div>
+                      <div className="text-xs text-text-secondary mt-1.5">{scanStatus === 'PRESENT' ? 'Marking as Present' : 'Marking as Excused'}</div>
                       <div className="w-full max-w-sm mt-4 text-left">
                         <CameraPermission
                           onGranted={() => {

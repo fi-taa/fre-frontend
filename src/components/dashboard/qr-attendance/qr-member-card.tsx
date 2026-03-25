@@ -13,14 +13,12 @@ export interface QrMemberCardProps {
 
 function statusLabel(status: AttendanceRecordStatus): string {
   if (status === 'PRESENT') return 'Present';
-  if (status === 'LATE') return 'Late';
   if (status === 'EXCUSED') return 'Excused';
   return 'Missing';
 }
 
 function statusBadgeClasses(status: AttendanceRecordStatus): string {
   if (status === 'PRESENT') return 'bg-green-100 text-green-800';
-  if (status === 'LATE') return 'bg-link/5 text-link';
   if (status === 'EXCUSED') return 'bg-accent/10 text-accent';
   return 'bg-bg-beige-light text-text-secondary';
 }

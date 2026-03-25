@@ -22,19 +22,17 @@ export interface AttendanceTakeCombinedProps {
 }
 
 function isScanTargetStatus(status: AttendanceRecordStatus): boolean {
-  return status === 'PRESENT' || status === 'LATE' || status === 'EXCUSED';
+  return status === 'PRESENT' || status === 'EXCUSED';
 }
 
 function statusLabel(status: AttendanceRecordStatus): string {
   if (status === 'PRESENT') return 'Present';
-  if (status === 'LATE') return 'Late';
   if (status === 'EXCUSED') return 'Excused';
   return 'Absent';
 }
 
 function statusBadgeClasses(status: AttendanceRecordStatus): string {
   if (status === 'PRESENT') return 'bg-green-100 text-green-800';
-  if (status === 'LATE') return 'bg-link/5 text-link';
   if (status === 'EXCUSED') return 'bg-accent/10 text-accent';
   return 'bg-bg-beige-light text-text-secondary';
 }
@@ -143,19 +141,17 @@ export function AttendanceTakeCombined({ onFinish }: AttendanceTakeCombinedProps
 
   const counts = useMemo(() => {
     let present = 0;
-    let late = 0;
     let excused = 0;
     let absent = 0;
 
     for (const s of eligibleStudents) {
       const st = statusByStudentId.get(s.id) ?? 'ABSENT';
       if (st === 'PRESENT') present += 1;
-      else if (st === 'LATE') late += 1;
       else if (st === 'EXCUSED') excused += 1;
       else absent += 1;
     }
 
-    return { present, late, excused, absent, total: eligibleStudents.length };
+    return { present, excused, absent, total: eligibleStudents.length };
   }, [eligibleStudents, statusByStudentId]);
 
   function applySession(sessionId: number, records: Array<{ student_id: number; status: AttendanceRecordStatus }>) {
@@ -409,7 +405,6 @@ export function AttendanceTakeCombined({ onFinish }: AttendanceTakeCombinedProps
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Present {counts.present}</span>
-            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-link/5 text-link">Late {counts.late}</span>
             <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-accent/10 text-accent">Excused {counts.excused}</span>
             <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-bg-beige-light text-text-secondary">Absent {counts.absent}</span>
           </div>
@@ -439,7 +434,7 @@ export function AttendanceTakeCombined({ onFinish }: AttendanceTakeCombinedProps
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="text-xs font-semibold text-text-secondary">QR Scan</div>
               <div className="flex gap-2">
-                {(['PRESENT', 'LATE', 'EXCUSED'] as AttendanceRecordStatus[]).filter(isScanTargetStatus).map((status) => (
+                {(['PRESENT', 'EXCUSED'] as AttendanceRecordStatus[]).filter(isScanTargetStatus).map((status) => (
                   <button
                     key={status}
                     type="button"
@@ -535,7 +530,7 @@ export function AttendanceTakeCombined({ onFinish }: AttendanceTakeCombinedProps
                             {statusLabel(status)}
                           </span>
                           <div className="flex gap-1">
-                            {(['PRESENT', 'LATE', 'EXCUSED', 'ABSENT'] as AttendanceRecordStatus[]).map((s) => (
+                            {(['PRESENT', 'EXCUSED', 'ABSENT'] as AttendanceRecordStatus[]).map((s) => (
                               <button
                                 key={s}
                                 type="button"
@@ -547,7 +542,7 @@ export function AttendanceTakeCombined({ onFinish }: AttendanceTakeCombinedProps
                                     : 'border-border/40 text-text-primary hover:border-link/40 hover:bg-link/5'
                                 }`}
                               >
-                                {s === 'PRESENT' ? 'P' : s === 'LATE' ? 'L' : s === 'EXCUSED' ? 'E' : 'A'}
+                                {s === 'PRESENT' ? 'P' : s === 'EXCUSED' ? 'E' : 'A'}
                               </button>
                             ))}
                           </div>

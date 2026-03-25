@@ -316,7 +316,7 @@ export interface Attendance {
 
 export type AttendanceSessionType = 'REGULAR' | 'PROGRAM';
 
-export type AttendanceRecordStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED';
+export type AttendanceRecordStatus = 'PRESENT' | 'ABSENT' | 'EXCUSED';
 
 export interface AttendanceRecordResponse {
   id: number;
