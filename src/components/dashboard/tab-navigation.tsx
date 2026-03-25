@@ -1,5 +1,6 @@
 import { RECORD_CATEGORIES, CATEGORY_LABELS } from '@/types';
 import type { RecordCategory } from '@/types';
+import { useI18n } from '@/i18n/I18nProvider';
 
 interface TabNavigationProps {
   selectedCategory: RecordCategory | null;
@@ -10,6 +11,7 @@ export function TabNavigation({
   selectedCategory,
   onCategoryChange,
 }: TabNavigationProps) {
+  const { t } = useI18n();
   return (
     <div className="flex w-full bg-card border-b border-border/30">
       {RECORD_CATEGORIES.map((category) => {
@@ -24,7 +26,7 @@ export function TabNavigation({
                 : 'text-text-secondary hover:text-text-primary hover:bg-bg-beige-light'
             }`}
           >
-            <span className="relative z-10">{CATEGORY_LABELS[category]}</span>
+            <span className="relative z-10">{t(CATEGORY_LABELS[category])}</span>
             {isSelected && (
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
             )}

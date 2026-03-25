@@ -11,8 +11,8 @@ import type { RootState } from '@/store/store';
 import { PageLoader } from '@/components/ui/page-loader';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 
-const AttendanceForm = dynamic(
-  () => import('@/components/dashboard/attendance-form').then((m) => ({ default: m.AttendanceForm })),
+const AttendanceTakeCombined = dynamic(
+  () => import('@/components/dashboard/attendance-take-combined').then((m) => ({ default: m.AttendanceTakeCombined })),
   { loading: () => <PageLoader minHeight={false} className="py-8" />, ssr: false }
 );
 
@@ -130,9 +130,7 @@ export function AttendanceContent() {
               </button>
             </div>
             <div className="p-4">
-              {activeTab === 'take' && (
-                <AttendanceForm onSuccess={handleSuccess} initialRecordId={recordIdParam || undefined} />
-              )}
+              {activeTab === 'take' && <AttendanceTakeCombined onFinish={handleSuccess} />}
               {activeTab === 'view' && <AttendanceList recordId={recordIdParam || undefined} />}
             </div>
           </div>

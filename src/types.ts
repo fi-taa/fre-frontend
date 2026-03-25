@@ -181,6 +181,8 @@ export interface Student {
   created_by_id?: number;
   created_at?: string;
   updated_at?: string;
+  qr_code?: string | null;
+  qr_payload?: string | null;
 }
 
 export interface StudentAddress {
