@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 export interface QrScannerProps {
@@ -8,9 +8,9 @@ export interface QrScannerProps {
 }
 
 export function QrScanner({ onScanSuccess }: QrScannerProps) {
-  const readerId = 'qr-attendance-reader';
+  const generatedId = useId().replace(/:/g, '');
+  const readerId = `qr-attendance-reader-${generatedId}`;
   const callbackRef = useRef(onScanSuccess);
-
   const scannerInstanceRef = useRef<InstanceType<typeof Html5QrcodeScanner> | null>(null);
 
   useEffect(() => {
@@ -19,6 +19,10 @@ export function QrScanner({ onScanSuccess }: QrScannerProps) {
 
   useEffect(() => {
     if (scannerInstanceRef.current) return;
+    const mountNode = document.getElementById(readerId);
+    if (!mountNode) return;
+
+    mountNode.innerHTML = '';
 
     const scanner = new Html5QrcodeScanner(
       readerId,
@@ -39,8 +43,10 @@ export function QrScanner({ onScanSuccess }: QrScannerProps) {
       const instance = scannerInstanceRef.current;
       scannerInstanceRef.current = null;
       instance?.clear().catch(() => {});
+      const node = document.getElementById(readerId);
+      if (node) node.innerHTML = '';
     };
-  }, []);
+  }, [readerId]);
 
   return <div id={readerId} className="w-full min-h-[320px]" />;
 }
