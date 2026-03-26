@@ -75,6 +75,41 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
   } = useGetEligibleStudentsQuery({ department_id: departmentIdNum, category: categoryApi }, { skip: !canFetchEligible });
 
   const studentMap = useMemo(() => new Map(eligibleStudents.map((s: Student) => [s.id, s])), [eligibleStudents]);
+  const studentByQrToken = useMemo(() => {
+    const tokenMap = new Map<string, Student>();
+    for (const student of eligibleStudents) {
+      const token = student.qr_token?.trim();
+      if (token) tokenMap.set(token.toLowerCase(), student);
+    }
+    return tokenMap;
+  }, [eligibleStudents]);
+
+  function resolveStudentFromToken(decodedText: string): Student | undefined {
+    const trimmed = decodedText.trim();
+    if (!trimmed) return undefined;
+
+    const direct = studentByQrToken.get(trimmed.toLowerCase());
+    if (direct) return direct;
+
+    try {
+      const parsedUrl = new URL(trimmed);
+      const queryToken = parsedUrl.searchParams.get('qr_token') ?? parsedUrl.searchParams.get('token');
+      if (queryToken) {
+        const byQuery = studentByQrToken.get(queryToken.trim().toLowerCase());
+        if (byQuery) return byQuery;
+      }
+      const pathParts = parsedUrl.pathname.split('/').filter(Boolean);
+      const lastSegment = pathParts[pathParts.length - 1];
+      if (lastSegment) {
+        const byPath = studentByQrToken.get(lastSegment.trim().toLowerCase());
+        if (byPath) return byPath;
+      }
+    } catch {
+      return undefined;
+    }
+
+    return undefined;
+  }
 
   const [createBatch, { isLoading: isBatchCreating }] = useCreateAttendanceBatchMutation();
   const [collectAttendance] = useCollectAttendanceMutation();
@@ -220,7 +255,9 @@ export function AttendanceQrScreen({ onFinish }: AttendanceQrScreenProps) {
       return;
     }
 
-    const studentId = payloadWithSession ? payloadWithSession.studentId : decodeStudentIdFromQr(decodedText);
+    const parsedStudentId = payloadWithSession ? payloadWithSession.studentId : decodeStudentIdFromQr(decodedText);
+    const studentFromToken = resolveStudentFromToken(decodedText);
+    const studentId = parsedStudentId ?? studentFromToken?.id;
     if (!studentId) {
       setScanFeedback('Invalid QR code');
       return;

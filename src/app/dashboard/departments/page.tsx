@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
-import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
 import type { RootState } from '@/store/store';
 import { PageLoader } from '@/components/ui/page-loader';
@@ -21,29 +20,15 @@ export default function DepartmentsPage() {
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const { data: allDepartments = [], isLoading } = useListDepartmentsQuery();
   const { data: currentUserData } = useGetCurrentUserQuery();
   const [deleteDepartment] = useDeleteDepartmentMutation();
 
   const currentUser = currentUserData?.data;
   const isSuperAdmin = currentUser?.role === 'super_admin';
-  const isAdmin = currentUser?.role === 'admin';
-  const isManager = currentUser?.role === 'manager';
-  const adminDepartmentIds = currentUser?.department_ids || [];
-  const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
-  
-  const departments = useMemo(() => {
-    if (isSuperAdmin) {
-      return allDepartments;
-    }
-    if (isAdmin && adminDepartmentIds.length > 0) {
-      return allDepartments.filter((dept: Department) => adminDepartmentIds.includes(dept.id));
-    }
-    if (isManager && managerDepartmentIds.length > 0) {
-      return allDepartments.filter((dept: Department) => managerDepartmentIds.includes(dept.id));
-    }
-    return [];
-  }, [allDepartments, isSuperAdmin, isAdmin, isManager, currentUser, adminDepartmentIds, managerDepartmentIds]);
+  const canAddDepartment = isSuperAdmin;
+  const { data: departments = [], isLoading } = useListDepartmentsQuery(undefined, {
+    skip: !isSuperAdmin,
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -53,8 +38,12 @@ export default function DepartmentsPage() {
     if (!mounted) return;
     if (!isAuthenticated) {
       router.push('/login');
+      return;
     }
-  }, [mounted, isAuthenticated, router]);
+    if (currentUser && !isSuperAdmin) {
+      router.push('/dashboard');
+    }
+  }, [mounted, isAuthenticated, currentUser, isSuperAdmin, router]);
 
   function handleLogout() {
     dispatch(clearAuth());
@@ -66,6 +55,7 @@ export default function DepartmentsPage() {
   }
 
   async function handleDelete(dept: Department) {
+    if (!isSuperAdmin) return;
     if (!confirm(`Delete "${dept.name}"? This cannot be undone.`)) return;
     try {
       await deleteDepartment(dept.id).unwrap();
@@ -93,7 +83,6 @@ export default function DepartmentsPage() {
   }
 
   const hasData = departments.length > 0 || !isLoading;
-  const canAddDepartment = isSuperAdmin;
 
   return (
     <div className="min-h-screen bg-bg-beige flex flex-col relative">
@@ -146,13 +135,21 @@ export default function DepartmentsPage() {
                       <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary hidden sm:table-cell">
                         Description
                       </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary hidden md:table-cell">
+                        Profile Builder
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary hidden lg:table-cell">
+                        Allowed Fields
+                      </th>
                       <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-text-secondary w-28">
                         Actions
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {departments.map((dept) => (
+                    {departments.map((dept) => {
+                      const allowedStudentFields = Array.isArray(dept.allowed_student_fields) ? dept.allowed_student_fields : [];
+                      return (
                       <tr
                         key={dept.id}
                         className="border-b border-border/30 hover:bg-bg-beige-light transition-colors"
@@ -162,6 +159,12 @@ export default function DepartmentsPage() {
                         </td>
                         <td className="px-4 py-3 text-sm text-text-secondary hidden sm:table-cell max-w-xs truncate">
                           {dept.description ?? '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-text-secondary hidden md:table-cell">
+                          {dept.is_profile_builder ? 'Yes' : 'No'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-text-secondary hidden lg:table-cell max-w-xs truncate">
+                          {allowedStudentFields.length > 0 ? allowedStudentFields.join(', ') : '—'}
                         </td>
                         <td className="px-4 py-3 text-right">
                           {canAddDepartment && (
@@ -179,7 +182,8 @@ export default function DepartmentsPage() {
                           )}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

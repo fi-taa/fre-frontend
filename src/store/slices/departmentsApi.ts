@@ -2,6 +2,13 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/store/baseQuery';
 import type { Department, DepartmentCreate, DepartmentUpdate } from '@/types';
 
+function normalizeDepartment(department: Department): Department {
+  return {
+    ...department,
+    allowed_student_fields: Array.isArray(department.allowed_student_fields) ? department.allowed_student_fields : [],
+  };
+}
+
 export const departmentsApi = createApi({
   reducerPath: 'departmentsApi',
   baseQuery: baseQueryWithReauth,
@@ -11,14 +18,15 @@ export const departmentsApi = createApi({
     listDepartments: builder.query<Department[], void>({
       query: () => '/departments/',
       transformResponse: (response: Department[] | { data?: Department[]; items?: Department[]; results?: Department[] }) => {
-        if (Array.isArray(response)) return response;
-        return response.data ?? response.items ?? response.results ?? [];
+        if (Array.isArray(response)) return response.map(normalizeDepartment);
+        return (response.data ?? response.items ?? response.results ?? []).map(normalizeDepartment);
       },
       providesTags: ['Department'],
     }),
 
     getDepartment: builder.query<Department, number>({
       query: (departmentId) => `/departments/${departmentId}`,
+      transformResponse: (response: Department) => normalizeDepartment(response),
       providesTags: ['Department'],
     }),
 

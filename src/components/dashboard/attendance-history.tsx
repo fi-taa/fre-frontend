@@ -19,15 +19,19 @@ interface SessionRecordView {
 interface AttendanceHistoryProps {
   recordId: string;
   attendanceHref?: string;
+  departmentId?: number;
 }
 
-export function AttendanceHistory({ recordId, attendanceHref }: AttendanceHistoryProps) {
+export function AttendanceHistory({ recordId, attendanceHref, departmentId }: AttendanceHistoryProps) {
   const [statusFilter, setStatusFilter] = useState<'all' | 'present' | 'absent'>('all');
   const [dateFilter, setDateFilter] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
   const recordIdNum = parseInt(recordId, 10);
-  const { data: student } = useGetStudentQuery(recordIdNum, { skip: isNaN(recordIdNum) });
+  const { data: student } = useGetStudentQuery(
+    { studentId: recordIdNum, department_id: departmentId },
+    { skip: isNaN(recordIdNum) }
+  );
   const record = student ? studentToRecordView(student) : undefined;
   const categoryApi = record ? CATEGORY_API_VALUES[record.category] : '';
 

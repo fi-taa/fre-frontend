@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { useDashboardData } from '@/hooks/use-dashboard-data';
 import { usePagination } from '@/hooks/use-pagination';
+import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
+import { useListDepartmentsQuery } from '@/store/slices/departmentsApi';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { TabNavigation } from '@/components/dashboard/tab-navigation';
 import { SearchBar } from '@/components/dashboard/search-bar';
@@ -19,6 +21,34 @@ export default function RecordsPage() {
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<number>(0);
+  const { data: currentUserData } = useGetCurrentUserQuery();
+  const currentUser = currentUserData?.data;
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isAdmin = currentUser?.role === 'admin';
+  const isManager = currentUser?.role === 'manager';
+  const adminDepartmentIds = currentUser?.department_ids ?? [];
+  const managerDepartmentIds = currentUser?.department_ids ?? [];
+  const { data: allDepartments = [] } = useListDepartmentsQuery(undefined, {
+    skip: !isSuperAdmin,
+  });
+
+  useEffect(() => {
+    if (!currentUser) return;
+    if (isSuperAdmin) {
+      setSelectedDepartmentId((current) => (current > 0 ? current : 1));
+      return;
+    }
+    if (isAdmin) {
+      const firstAdminDepartment = adminDepartmentIds[0] ?? 0;
+      setSelectedDepartmentId((current) => (current > 0 ? current : firstAdminDepartment));
+      return;
+    }
+    if (isManager) {
+      const managerDepartmentId = managerDepartmentIds[0] ?? 0;
+      setSelectedDepartmentId(managerDepartmentId);
+    }
+  }, [currentUser, isSuperAdmin, isAdmin, isManager, adminDepartmentIds, managerDepartmentIds]);
 
   const {
     filteredRecords,
@@ -30,7 +60,7 @@ export default function RecordsPage() {
     setSelectedCategory,
     setSearchTerm,
     handleSort,
-  } = useDashboardData();
+  } = useDashboardData(selectedDepartmentId);
 
   const {
     currentPage,
@@ -104,6 +134,31 @@ export default function RecordsPage() {
             </Link>
           </div>
           <TabNavigation selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+          {(isSuperAdmin || isAdmin) && (
+            <div className="px-4 py-3 border-b border-border/20">
+              <label htmlFor="records-department-filter" className="block text-xs font-medium mb-1.5 text-text-secondary">
+                Department
+              </label>
+              <select
+                id="records-department-filter"
+                value={selectedDepartmentId > 0 ? String(selectedDepartmentId) : ''}
+                onChange={(event) => setSelectedDepartmentId(Number(event.target.value))}
+                className="w-full sm:w-[320px] h-10 px-3 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
+              >
+                {isSuperAdmin
+                  ? allDepartments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.name}
+                    </option>
+                  ))
+                  : adminDepartmentIds.map((departmentId) => (
+                    <option key={departmentId} value={departmentId}>
+                      Department {departmentId}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} onDelete={() => {}} onFilter={handleFilter} hasSelection={false} />
         </div>
       </div>
@@ -121,6 +176,7 @@ export default function RecordsPage() {
               onNext={nextPage}
               canGoPrevious={canGoPrevious}
               canGoNext={canGoNext}
+              selectedDepartmentId={selectedDepartmentId}
             />
           ) : (
             <div className="flex items-center justify-center min-h-[300px]">

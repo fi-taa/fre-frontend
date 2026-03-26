@@ -69,16 +69,24 @@ export interface Department {
   id: number;
   name: string;
   description?: string;
+  is_profile_builder: boolean;
+  allowed_student_fields: string[] | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DepartmentCreate {
   name: string;
   description?: string;
+  is_profile_builder: boolean;
+  allowed_student_fields: string[];
 }
 
 export interface DepartmentUpdate {
   name?: string;
   description?: string;
+  is_profile_builder?: boolean;
+  allowed_student_fields?: string[];
 }
 
 export interface ChildFamily {
@@ -181,8 +189,7 @@ export interface Student {
   created_by_id?: number;
   created_at?: string;
   updated_at?: string;
-  qr_code?: string | null;
-  qr_payload?: string | null;
+  qr_token?: string | null;
 }
 
 export interface StudentAddress {

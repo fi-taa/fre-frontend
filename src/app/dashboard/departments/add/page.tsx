@@ -10,6 +10,7 @@ import type { RootState } from '@/store/store';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { useCreateDepartmentMutation } from '@/store/slices/departmentsApi';
 import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
+import { StudentFieldsDropdown } from '@/components/dashboard/student-fields-dropdown';
 
 export default function AddDepartmentPage() {
   const router = useRouter();
@@ -17,6 +18,8 @@ export default function AddDepartmentPage() {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [isProfileBuilder, setIsProfileBuilder] = useState(false);
+  const [allowedStudentFields, setAllowedStudentFields] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [createDepartment, { isLoading }] = useCreateDepartmentMutation();
 
@@ -52,7 +55,12 @@ export default function AddDepartmentPage() {
       return;
     }
     try {
-      await createDepartment({ name: trimmedName, description: description.trim() || undefined }).unwrap();
+      await createDepartment({
+        name: trimmedName,
+        description: description.trim() || undefined,
+        is_profile_builder: isProfileBuilder,
+        allowed_student_fields: allowedStudentFields,
+      }).unwrap();
       router.push('/dashboard/departments');
     } catch (err: unknown) {
       const data = err && typeof err === 'object' && 'data' in err ? (err as { data?: { detail?: unknown } }).data : undefined;
@@ -121,6 +129,24 @@ export default function AddDepartmentPage() {
                 className="w-full px-4 py-2 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
                 placeholder="Optional description"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                id="dept-profile-builder"
+                type="checkbox"
+                checked={isProfileBuilder}
+                onChange={(e) => setIsProfileBuilder(e.target.checked)}
+                className="h-4 w-4 rounded border border-border/40"
+              />
+              <label htmlFor="dept-profile-builder" className="text-sm font-medium text-text-primary">
+                Is profile builder
+              </label>
+            </div>
+            <div>
+              <label htmlFor="dept-allowed-fields" className="block text-sm font-medium mb-1.5 text-text-primary">
+                Allowed student fields
+              </label>
+              <StudentFieldsDropdown value={allowedStudentFields} onChange={setAllowedStudentFields} />
             </div>
             {error && (
               <div className="px-3 py-2 rounded-lg bg-red-50 text-red-800 text-sm">{error}</div>

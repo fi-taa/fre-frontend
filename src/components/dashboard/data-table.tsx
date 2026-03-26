@@ -16,6 +16,7 @@ interface DataTableProps {
   onNext: () => void;
   canGoPrevious: boolean;
   canGoNext: boolean;
+  selectedDepartmentId?: number;
 }
 
 export function DataTable({
@@ -30,6 +31,7 @@ export function DataTable({
   onNext,
   canGoPrevious,
   canGoNext,
+  selectedDepartmentId,
 }: DataTableProps) {
   const { t } = useI18n();
   const SortIcon = ({ field }: { field: SortField }) => {
@@ -99,10 +101,14 @@ export function DataTable({
           <div className="py-8 text-center text-text-secondary text-sm">{t('records.empty')}</div>
         ) : (
           <>
-            {records.map((record) => (
+            {records.map((record) => {
+              const detailHref = selectedDepartmentId
+                ? `/dashboard/records/${record.id}?department_id=${selectedDepartmentId}`
+                : `/dashboard/records/${record.id}`;
+              return (
               <Link
                 key={record.id}
-                href={`/dashboard/records/${record.id}`}
+                href={detailHref}
                 className="flex min-h-[44px] items-center justify-between gap-3 rounded-lg border border-border/30 bg-bg-beige-light/50 px-4 py-3 text-left transition-colors hover:bg-bg-beige-light focus:outline-none focus:ring-2 focus:ring-link/30"
               >
                 <div className="min-w-0 flex-1">
@@ -113,7 +119,8 @@ export function DataTable({
                   <path d="m9 18 6-6-6-6" />
                 </svg>
               </Link>
-            ))}
+              );
+            })}
             <div className="flex justify-end pt-2">
               <PaginationControls
                 currentPage={currentPage}
@@ -174,7 +181,17 @@ export function DataTable({
               </tr>
             ) : (
               records.map((record, index) => (
-                <TableRow key={record.id} record={record} onView={onView} index={index} />
+                <TableRow
+                  key={record.id}
+                  record={record}
+                  onView={onView}
+                  index={index}
+                  detailHref={
+                    selectedDepartmentId
+                      ? `/dashboard/records/${record.id}?department_id=${selectedDepartmentId}`
+                      : `/dashboard/records/${record.id}`
+                  }
+                />
               ))
             )}
           </tbody>

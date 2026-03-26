@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { handleLogout } from '@/lib/auth-helpers';
 import { clearAuth } from '@/store/slices/authSlice';
@@ -17,13 +17,19 @@ import type { RootState } from '@/store/store';
 export default function RecordDetailsPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const recordIdParam = params.id as string;
   const recordId = parseInt(recordIdParam, 10);
+  const departmentIdParam = searchParams.get('department_id');
+  const departmentId = departmentIdParam ? parseInt(departmentIdParam, 10) : undefined;
   const isValidId = Boolean(recordIdParam && !isNaN(recordId));
   const dispatch = useDispatch();
   const [mounted, setMounted] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const { data: student, isLoading, isError } = useGetStudentQuery(recordId, { skip: !isValidId });
+  const { data: student, isLoading, isError } = useGetStudentQuery(
+    { studentId: recordId, department_id: departmentId && !isNaN(departmentId) ? departmentId : undefined },
+    { skip: !isValidId }
+  );
   const [deleteStudent] = useDeleteStudentMutation();
 
   useEffect(() => {
@@ -123,8 +129,17 @@ export default function RecordDetailsPage() {
             </svg>
             Back
           </Link>
-          <RecordDetails record={record} editHref={`/dashboard/records/${recordIdParam}/edit`} onDelete={handleDelete} />
-          <AttendanceHistory recordId={recordIdParam} attendanceHref={`/dashboard/attendance?recordId=${recordIdParam}`} />
+          <RecordDetails
+            record={record}
+            qrToken={student.qr_token}
+            editHref={`/dashboard/records/${recordIdParam}/edit`}
+            onDelete={handleDelete}
+          />
+          <AttendanceHistory
+            recordId={recordIdParam}
+            departmentId={departmentId && !isNaN(departmentId) ? departmentId : undefined}
+            attendanceHref={`/dashboard/attendance?recordId=${recordIdParam}`}
+          />
         </div>
       </div>
     </div>

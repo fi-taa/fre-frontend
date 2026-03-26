@@ -14,6 +14,7 @@ import {
   useUpdateDepartmentMutation,
 } from '@/store/slices/departmentsApi';
 import { useGetCurrentUserQuery } from '@/store/slices/usersApi';
+import { StudentFieldsDropdown } from '@/components/dashboard/student-fields-dropdown';
 
 export default function EditDepartmentPage() {
   const router = useRouter();
@@ -26,6 +27,8 @@ export default function EditDepartmentPage() {
   const { data: department, isLoading: loadingDept, isError } = useGetDepartmentQuery(id, { skip: !isValidId });
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [isProfileBuilder, setIsProfileBuilder] = useState(false);
+  const [allowedStudentFields, setAllowedStudentFields] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
 
@@ -40,6 +43,8 @@ export default function EditDepartmentPage() {
     if (department) {
       setName(department.name);
       setDescription(department.description ?? '');
+      setIsProfileBuilder(department.is_profile_builder);
+      setAllowedStudentFields(Array.isArray(department.allowed_student_fields) ? department.allowed_student_fields : []);
     }
   }, [department]);
 
@@ -80,7 +85,12 @@ export default function EditDepartmentPage() {
     try {
       await updateDepartment({
         departmentId: id,
-        body: { name: trimmedName, description: description.trim() || undefined },
+        body: {
+          name: trimmedName,
+          description: description.trim() || undefined,
+          is_profile_builder: isProfileBuilder,
+          allowed_student_fields: allowedStudentFields,
+        },
       }).unwrap();
       router.push('/dashboard/departments');
     } catch (err: unknown) {
@@ -158,6 +168,24 @@ export default function EditDepartmentPage() {
                 className="w-full px-4 py-2 text-sm border border-border/40 rounded-lg bg-bg-beige-light text-text-primary focus:outline-none focus:ring-2 focus:ring-link/30"
                 placeholder="Optional description"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                id="edit-dept-profile-builder"
+                type="checkbox"
+                checked={isProfileBuilder}
+                onChange={(e) => setIsProfileBuilder(e.target.checked)}
+                className="h-4 w-4 rounded border border-border/40"
+              />
+              <label htmlFor="edit-dept-profile-builder" className="text-sm font-medium text-text-primary">
+                Is profile builder
+              </label>
+            </div>
+            <div>
+              <label htmlFor="edit-dept-allowed-fields" className="block text-sm font-medium mb-1.5 text-text-primary">
+                Allowed student fields
+              </label>
+              <StudentFieldsDropdown value={allowedStudentFields} onChange={setAllowedStudentFields} />
             </div>
             {error && (
               <div className="px-3 py-2 rounded-lg bg-red-50 text-red-800 text-sm">{error}</div>

@@ -357,7 +357,7 @@ function SessionRow({ session, departmentName, programName, isExpanded, onToggle
       {isExpanded && (
         <tr>
           <td colSpan={6} className="p-0 bg-bg-beige-light/50">
-            <SessionDetail sessionId={session.id} />
+            <SessionDetail sessionId={session.id} departmentId={session.department_id} />
           </td>
         </tr>
       )}
@@ -367,12 +367,13 @@ function SessionRow({ session, departmentName, programName, isExpanded, onToggle
 
 interface SessionDetailProps {
   sessionId: number;
+  departmentId: number;
 }
 
-function SessionDetail({ sessionId }: SessionDetailProps) {
+function SessionDetail({ sessionId, departmentId }: SessionDetailProps) {
   const { t } = useI18n();
   const { data: session, isLoading } = useGetAttendanceSessionQuery(sessionId);
-  const { data: students = [] } = useListStudentsQuery();
+  const { data: students = [] } = useListStudentsQuery({ department_id: departmentId }, { skip: departmentId <= 0 });
   const studentMap = useMemo(() => new Map(students.map((s) => [s.id, s])), [students]);
 
   if (isLoading || !session) {

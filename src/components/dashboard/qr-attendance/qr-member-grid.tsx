@@ -14,8 +14,7 @@ export function QrMemberGrid({ students, statusByStudentId, printMode, ageLabel 
   if (students.length === 0) return null;
 
   function getStudentQrValue(student: Student): string {
-    const anyStudent = student as Student & { qr_code?: string | null; qr_payload?: string | null };
-    return anyStudent.qr_code ?? anyStudent.qr_payload ?? '';
+    return student.qr_token ?? '';
   }
 
   return (

@@ -7,9 +7,10 @@ interface TableRowProps {
   record: PersonRecord;
   onView?: (record: PersonRecord) => void;
   index?: number;
+  detailHref?: string;
 }
 
-function TableRowComponent({ record, index }: TableRowProps) {
+function TableRowComponent({ record, index, detailHref }: TableRowProps) {
   const isEven = index !== undefined && index % 2 === 0;
   return (
     <tr className={`border-b border-border/30 transition-colors duration-200 group ${isEven ? 'bg-table-row-alt' : 'bg-card'} hover:bg-bg-beige-light`}>
@@ -26,7 +27,7 @@ function TableRowComponent({ record, index }: TableRowProps) {
       <td className="px-3 py-2 text-sm text-text-primary">{record.age}</td>
       <td className="px-3 py-2">
         <Link
-          href={`/dashboard/records/${record.id}`}
+          href={detailHref ?? `/dashboard/records/${record.id}`}
           className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-border/40 hover:border-link/40 hover:bg-link/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-link/30"
           aria-label="View details"
         >

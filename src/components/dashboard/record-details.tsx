@@ -1,17 +1,19 @@
 'use client';
 
 import Link from 'next/link';
+import { QRCodeSVG } from 'qrcode.react';
 import { getFormConfigByCategory } from '@/lib/form-config';
 import { CATEGORY_LABELS } from '@/types';
 import type { PersonRecord } from '@/types';
 
 interface RecordDetailsProps {
   record: PersonRecord;
+  qrToken?: string | null;
   editHref?: string;
   onDelete?: () => void;
 }
 
-export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps) {
+export function RecordDetails({ record, qrToken, editHref, onDelete }: RecordDetailsProps) {
   const formConfig = getFormConfigByCategory(record.category);
 
   function renderFieldValue(
@@ -62,6 +64,23 @@ export function RecordDetails({ record, editHref, onDelete }: RecordDetailsProps
       </div>
 
       <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+        <div className="rounded-lg border border-border/30 bg-bg-beige-light p-3 sm:p-4">
+          <div className="text-sm sm:text-base font-semibold text-text-primary">QR Info</div>
+          <div className="mt-2 text-xs text-text-secondary break-all">
+            {qrToken && qrToken.trim() ? qrToken : 'QR token not available'}
+          </div>
+          <div className="mt-3 flex items-center justify-center sm:justify-start">
+            {qrToken && qrToken.trim() ? (
+              <div className="rounded-md border border-border/30 bg-card p-2">
+                <QRCodeSVG value={qrToken} size={140} level="M" includeMargin />
+              </div>
+            ) : (
+              <div className="w-[140px] h-[140px] rounded-md border border-border/30 bg-card flex items-center justify-center text-[11px] text-text-secondary">
+                QR missing
+              </div>
+            )}
+          </div>
+        </div>
         {formConfig.sections.map((section, sectionIndex) => {
           const hasData = section.fields.some(
             (field) => record[field.id as keyof PersonRecord] !== undefined && record[field.id as keyof PersonRecord] !== ''

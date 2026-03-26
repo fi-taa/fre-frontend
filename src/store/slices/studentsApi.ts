@@ -2,10 +2,10 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQueryWithReauth } from '@/store/baseQuery';
 import type { Student, StudentCreate, StudentUpdate } from '@/types';
 
-interface ListStudentsParams {
+export interface ListStudentsParams {
   skip?: number;
   limit?: number;
-  department_id?: number | null;
+  department_id: number;
   category?: 'CHILDREN' | 'ADOLESCENT' | 'YOUTH' | 'ADULT' | null;
 }
 
@@ -76,8 +76,11 @@ export const studentsApi = createApi({
       providesTags: ['Student'],
     }),
 
-    getStudent: builder.query<Student, number>({
-      query: (studentId) => `/students/${studentId}`,
+    getStudent: builder.query<Student, { studentId: number; department_id?: number }>({
+      query: ({ studentId, department_id }) => ({
+        url: `/students/${studentId}`,
+        params: department_id ? { department_id } : undefined,
+      }),
       providesTags: ['Student'],
     }),
 

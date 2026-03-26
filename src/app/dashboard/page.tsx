@@ -35,9 +35,6 @@ export default function DashboardPage() {
   const [statisticsView, setStatisticsView] = useState<'table' | 'graph'>('graph');
   const [departmentScopeId, setDepartmentScopeId] = useState<string>('all');
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-
-  const { data: students = [], isLoading: studentsLoading } = useListStudentsQuery();
-  const { data: departments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
   const { data: currentUserData } = useGetCurrentUserQuery();
   const currentUser = currentUserData?.data;
   const isSuperAdmin = currentUser?.role === 'super_admin';
@@ -46,6 +43,14 @@ export default function DashboardPage() {
   const canShowAttendanceAnalytics = isSuperAdmin || isAdmin;
   const adminDepartmentIds = currentUser?.department_ids || [];
   const managerDepartmentIds = isManager ? currentUser?.department_ids || [] : [];
+  const fallbackStudentDepartmentId = isSuperAdmin ? 1 : (isAdmin ? (adminDepartmentIds[0] ?? 0) : (managerDepartmentIds[0] ?? 0));
+  const studentDepartmentId = departmentScopeId !== 'all' ? parseInt(departmentScopeId, 10) : fallbackStudentDepartmentId;
+
+  const { data: students = [], isLoading: studentsLoading } = useListStudentsQuery(
+    { department_id: studentDepartmentId },
+    { skip: !currentUser || studentDepartmentId <= 0 }
+  );
+  const { data: departments = [], isLoading: departmentsLoading } = useListDepartmentsQuery();
 
   const { data: allUsersData, isLoading: allUsersLoading } = useListUsersQuery(undefined, {
     skip: !currentUser || !isSuperAdmin,
